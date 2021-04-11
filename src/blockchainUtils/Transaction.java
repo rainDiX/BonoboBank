@@ -36,7 +36,7 @@ public class Transaction {
 	}
 	
 	public String calculateHash() {
-		return miscUtils.HashUtil.applySha256(this.toString());
+		return HashUtil.applySha256(this.toString());
 	}
 	
 	
