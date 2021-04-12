@@ -3,10 +3,15 @@ package blockChain;
 import java.util.LinkedList;
 
 public class BlockChain {
-    int difficulty;
-    int blockCount;
-    LinkedList<Block> blockList;
-
+    /**
+     * Difficulté de la blockchain, içi le nombre de 0 par lequel
+     * commence le hash d'un bloc
+     */
+    private int difficulty;
+    /**
+     * Liste de blocs
+     */
+    private LinkedList<Block> blockList;
 
     public BlockChain(int difficulty) {
         this.difficulty = difficulty;
@@ -15,5 +20,5 @@ public class BlockChain {
     public int mineBlock() {
         return 0;
     }
-    
+
 }
