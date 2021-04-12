@@ -1,7 +1,7 @@
 package miscUtils;
 
 import com.google.gson.Gson;
-import blockchainUtils.BlockChain;
+import blockChain.BlockChain;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
