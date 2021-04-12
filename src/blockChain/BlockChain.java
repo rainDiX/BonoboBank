@@ -17,7 +17,7 @@ public class BlockChain {
         this.difficulty = difficulty;
     }
 
-    public int mineBlock() {
+    public int addBlock() {
         return 0;
     }
 
