@@ -163,7 +163,7 @@ local.properties
 .scala_dependencies
 .worksheet
 
-Javadoc
+#Javadoc
 doc/*
 
 # Uncomment this line if you wish to ignore the project description file.
