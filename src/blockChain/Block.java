@@ -8,7 +8,6 @@ import miscUtils.HashUtil;
 public class Block {
     int index;
     int nonce;
-    int transactionCount;
     String timestamp;
     String hash;
     String merkelTreeRootHash;
@@ -24,7 +23,7 @@ public class Block {
     }
 
     public int getTransactionCount() {
-        return transactionCount;
+        return transactionList.size();
     }
 
     public String getTimestamp() {
@@ -47,14 +46,11 @@ public class Block {
         return transactionList;
     }
 
-    public Block(int index, int transactionCount, String lastBlockHash,
-            ArrayList<String> transactionList) {
+    public Block(int index, String lastBlockHash, ArrayList<String> transactionList) {
         this.index = index;
         nonce = 0;
-        this.transactionCount = transactionCount;
         this.lastBlockHash = lastBlockHash;
         this.transactionList = transactionList;
-        transactionCount = transactionList.size();
         this.timestamp = LocalDateTime.now().toString();
         merkelTreeRootHash = ComputeMerkelTreeRootHash();
     }
@@ -62,34 +58,32 @@ public class Block {
     public Block() {
         this.index = 0;
         this.nonce = 0;
-        transactionCount = 1;
         transactionList.add("Genesis");
         this.timestamp = LocalDateTime.now().toString();
     }
 
 
-    private String computeNode(List<String> hashes) {
-        int size = hashes.size();
-        if (size > 2) {
-            String left = computeNode(hashes.subList(0, (int) Math.ceil(size / 2.0f)));
-            String right = computeNode(hashes.subList(((int) Math.ceil(size / 2.0f) )+ 1, size));
-            return HashUtil.applySha256(left + right);
-        } else if (size == 2) {
-            return HashUtil.applySha256(hashes.get(0) + hashes.get(1));
-        } else {
-            return HashUtil.applySha256(hashes.get(0) + hashes.get(0));
-        }
-    }
-
-    private String ComputeMerkelTreeRootHash(){
+    private String ComputeMerkelTreeRootHash() {
         // The number of level in a Merkel tree is the squareroot of
         // the number of transaction
         ArrayList<String> hashes = new ArrayList<String>();
 
-        for (int i = 0; i < transactionCount; ++i) {
-            hashes.set(i, HashUtil.applySha256(transactionList.get(i)));
+        for (int i = 0; i < transactionList.size(); ++i) {
+            hashes.add(HashUtil.applySha256(transactionList.get(i)));
         }
-        return computeNode(hashes);
+        while (hashes.size() != 1) {
+            if ((hashes.size() % 2) != 0) {
+                hashes.add(hashes.get(hashes.size() - 1));
+            }
+            int size = hashes.size();
+            for (int i = 0; i < size; i += 2) {
+                hashes.set(i, HashUtil.applySha256(hashes.get(i) + hashes.get(i+1)));
+            }
+            for (int i = size -1 ; i > 0; i -= 2) {
+                hashes.remove(i);
+            }
+        }
+        return hashes.get(0);
     }
 
 }
