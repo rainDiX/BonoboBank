@@ -2,35 +2,43 @@ package blockchainUtils;
 
 import java.time.*;
 import java.util.Random;
+
 import miscUtils.HashUtil;
 
 public class Transaction {
 
-	public Transaction(String emetteur, String recepteur, int montant) {
-		Random rng = new Random();
-		nb_random = rng.nextInt(MAX_VALUE);
+	static final int MAX_VALUE = 10000;
+
+	private int randNb;
+
+	private String date;
+
+	private int emetteur;
+
+	private int recepteur;
+
+	private long montant;
+
+	public Transaction(int emetteur, int recepteur, long montant) {
+		this.randNb = (new Random()).nextInt(MAX_VALUE);
 		this.date = LocalDateTime.now().toString();
 		this.emetteur = emetteur;
 		this.recepteur = recepteur;
 		this.montant = montant;
-
 	}
 
-	static final int MAX_VALUE = 10000;
-
-	private int nb_random;
-
-	private String date;
-
-	private String emetteur;
-
-	private String recepteur;
-
-	private int montant;
+	protected Transaction(String date, int emetteur, int recepteur, long montant, int randNb) {
+		this.randNb = randNb;
+		this.date = date;
+		this.emetteur = emetteur;
+		this.recepteur = recepteur;
+		this.montant = montant;
+	}
 
 	@Override
 	public String toString() {
-		return this.emetteur + "-" + this.recepteur + ":" + this.montant + "-" + this.nb_random;
+		return date + " - Source : user" + this.emetteur + " - Destination : user" + recepteur
+				+ " - Montant : " + montant + " - " + randNb;
 	}
 
 	public String getDate() {
