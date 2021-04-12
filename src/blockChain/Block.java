@@ -13,7 +13,7 @@ public class Block {
     String hash;
     String merkelTreeRootHash;
     String lastBlockHash;
-    ArrayList<Transaction> transactionList;
+    ArrayList<String> transactionList;
 
     public int getIndex() {
         return index;
@@ -43,12 +43,12 @@ public class Block {
         return lastBlockHash;
     }
 
-    public ArrayList<Transaction> getTransactionListList() {
+    public ArrayList<String> getTransactionListList() {
         return transactionList;
     }
 
     public Block(int index, int transactionCount, String lastBlockHash,
-            ArrayList<Transaction> transactionList) {
+            ArrayList<String> transactionList) {
         this.index = index;
         nonce = 0;
         this.transactionCount = transactionCount;
@@ -63,25 +63,10 @@ public class Block {
         this.index = 0;
         this.nonce = 0;
         transactionCount = 1;
-        transactionList.add(new Transaction());
+        transactionList.add("Genesis");
         this.timestamp = LocalDateTime.now().toString();
-        ;
     }
 
-    /* TODO: concurrent version of the computeNode fonction if necessary
-    private String concurrentComputeNode(List<String> hashes) {
-        int size = hashes.size();
-        if (size > 2) {
-            String left = computeNode(hashes.subList(0, (int) Math.ceil(size / 2.0f)));
-            String right = computeNode(hashes.subList(((int) Math.ceil(size / 2.0f) )+ 1, size));
-            return HashUtil.applySha256(left + right);
-        } else if (size == 2) {
-            return HashUtil.applySha256(hashes.get(0) + hashes.get(1));
-        } else {
-            return HashUtil.applySha256(hashes.get(0) + hashes.get(0));
-        }
-    }
-    */
 
     private String computeNode(List<String> hashes) {
         int size = hashes.size();
@@ -102,12 +87,8 @@ public class Block {
         ArrayList<String> hashes = new ArrayList<String>();
 
         for (int i = 0; i < transactionCount; ++i) {
-            hashes.set(i, transactionList.get(i).calculateHash());
+            hashes.set(i, HashUtil.applySha256(transactionList.get(i)));
         }
-        Thread computeHash = new Thread(() -> {
-            HashUtil.applySha256("");
-        });
-        computeHash.start();
         return computeNode(hashes);
     }
 
