@@ -20,7 +20,7 @@ Info du sujet :
 racines de Merkle aussi
 
 
-# Programme principal (À mettre temporairement dans App.java, on verra après)
+# Programme principal (À mettre temporairement dans bnb/Main.java)
 - Contient le main() :
 1. Création du genesis par Creator avec envoi de 50 Bnb à Creator par coinbase.
 2. Phase "Helicopter money" où coinbase envoie 50 Bnb à tous les utilisateurs user1 à userN, (pas pour Creator).
