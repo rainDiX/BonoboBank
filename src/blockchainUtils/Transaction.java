@@ -25,12 +25,12 @@ public class Transaction {
 	/**
 	 * Emetteur de la transaction
 	 */
-	private int emetteur;
+	private String emetteur;
 
 	/**
 	 * Récepteur de la transaction
 	 */
-	private int recepteur;
+	private String recepteur;
 
 	/**
 	 * Montant de la transaction en SatoBnB
@@ -44,7 +44,7 @@ public class Transaction {
 	 * @param recepteur Récepteur de la transaction
 	 * @param montant Montant de la transaction en SatoBnB
 	 */
-	public Transaction(int emetteur, int recepteur, long montant) {
+	public Transaction(String emetteur, String recepteur, long montant) {
 		this.randNb = (new Random()).nextInt(MAX_VALUE);
 		this.date = LocalDateTime.now().toString();
 		this.emetteur = emetteur;
@@ -64,7 +64,7 @@ public class Transaction {
 	 * @param montant Montant de la transaction en SatoBnB
 	 * @param randNb Nombre aléatoire associé à la transaction
 	 */
-	protected Transaction(String date, int emetteur, int recepteur, long montant, int randNb) {
+	protected Transaction(String date, String emetteur, String recepteur, long montant, int randNb) {
 		this.randNb = randNb;
 		this.date = date;
 		this.emetteur = emetteur;
@@ -74,7 +74,7 @@ public class Transaction {
 
 	@Override
 	public String toString() {
-		return date + " - Source : user" + this.emetteur + " - Destination : user" + recepteur + " - Montant : "
+		return date + " - Source : " + this.emetteur + " - Destination : " + recepteur + " - Montant : "
 				+ montant + " - " + randNb;
 	}
 

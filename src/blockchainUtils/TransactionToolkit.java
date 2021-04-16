@@ -14,11 +14,22 @@ public class TransactionToolkit {
 	 * @param userCount nombre d'utilisateur de la blockchain
 	 * @return une transaction d'un montant aléatoire entre 2 utilisateur aléatoire
 	 */
-	public String Generator(int userCount) {
-		int emetteur = rng.nextInt(userCount) + 1;
-		int recepteur;
+	public String Generate(int userCount) {
+		String emetteur;
+		String recepteur;
+		int randNb = rng.nextInt(userCount) + 2;
+		if (randNb > userCount) {
+			emetteur = "Creator";
+		} else {
+			emetteur = "user" + randNb;
+		}
 		do {
-			recepteur = rng.nextInt(userCount) + 1;
+			randNb = rng.nextInt(userCount) + 2;
+			if (randNb > userCount) {
+				recepteur = "Creator";
+			} else {
+				recepteur = "user" + randNb;
+			}
 		} while (recepteur == emetteur);
 		long montant = Math.abs(rng.nextLong());
 		Transaction tx = new Transaction(emetteur, recepteur, montant);
@@ -33,10 +44,10 @@ public class TransactionToolkit {
 	 */
 	public boolean isTransaction(String s) {
 		Pattern pattern = Pattern.compile(
-				"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)? - Source : user[0-9]+ - Destination : user[0-9]+ - Montant : [0-9]+ - [0-9]+$",
+				"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)? - Source : [a-zA-Z]+[0-9]* - Destination : [a-zA-Z]+[0-9]* - Montant : [0-9]+ - [0-9]+$",
 				Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(s);
-		return matcher.matches(); //TODO: cas genesis
+		return matcher.matches(); // TODO: cas genesis
 	}
 
 	/**
@@ -46,15 +57,15 @@ public class TransactionToolkit {
 	 * @return une transaction
 	 */
 
-	public Transaction Parser(String transaction) throws UnsupportedOperationException {
+	public Transaction Parse(String transaction) throws UnsupportedOperationException {
 		if (!isTransaction(transaction)) {
 			throw new UnsupportedOperationException("Malformed transaction");
 		}
 		// TODO: Genesis transaction parsing
 		String[] txstr = transaction.split(" ");
 		String date = txstr[0];
-		int emetteur = Integer.parseInt(txstr[4].substring(4));
-		int recepteur = Integer.parseInt(txstr[8].substring(4));
+		String emetteur = txstr[4];
+		String recepteur = txstr[8];
 		long montant = Long.parseLong(txstr[12]);
 		int randNb = Integer.parseInt(txstr[14]);
 		return new Transaction(date, emetteur, recepteur, montant, randNb);
