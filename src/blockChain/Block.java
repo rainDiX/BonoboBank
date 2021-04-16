@@ -1,18 +1,18 @@
 package blockChain;
 
-import java.util.*;
+import java.util.ArrayList;
 
 import java.time.*;
 import miscUtils.HashUtil;
 
 public class Block {
-    int index;
-    int nonce;
-    String timestamp;
-    String hash;
-    String merkelTreeRootHash;
-    String lastBlockHash;
-    ArrayList<String> transactionList;
+    private int index;
+    private int nonce;
+    private String timestamp;
+    private String hash;
+    private String merkelTreeRootHash;
+    private String prevBlockHash;
+    private ArrayList<String> transactionList;
 
     public int getIndex() {
         return index;
@@ -39,29 +39,41 @@ public class Block {
     }
 
     public String getLastBlockHash() {
-        return lastBlockHash;
+        return prevBlockHash;
     }
 
     public ArrayList<String> getTransactionListList() {
         return transactionList;
     }
 
-    public Block(int index, String lastBlockHash, ArrayList<String> transactionList) {
+    /**
+     * Constructeur du block
+     * <p>
+     * initialise un block non miné
+     * <p>
+     * 
+     * @param index           index du block
+     * @param prevBlockHash   hash du block précédent
+     * @param transactionList list des transactions stocké dans le block
+     */
+    public Block(int index, String prevBlockHash, ArrayList<String> transactionList) {
         this.index = index;
         nonce = 0;
-        this.lastBlockHash = lastBlockHash;
+        this.prevBlockHash = prevBlockHash;
         this.transactionList = transactionList;
         this.timestamp = LocalDateTime.now().toString();
         merkelTreeRootHash = ComputeMerkelTreeRootHash();
     }
 
+    /**
+     * Constructeur du block Genesis
+     */
     public Block() {
         this.index = 0;
         this.nonce = 0;
         transactionList.add("Genesis");
         this.timestamp = LocalDateTime.now().toString();
     }
-
 
     private String ComputeMerkelTreeRootHash() {
         // The number of level in a Merkel tree is the squareroot of
@@ -77,13 +89,42 @@ public class Block {
             }
             int size = hashes.size();
             for (int i = 0; i < size; i += 2) {
-                hashes.set(i, HashUtil.applySha256(hashes.get(i) + hashes.get(i+1)));
+                hashes.set(i, HashUtil.applySha256(hashes.get(i) + hashes.get(i + 1)));
             }
-            for (int i = size -1 ; i > 0; i -= 2) {
+            for (int i = size - 1; i > 0; i -= 2) {
                 hashes.remove(i);
             }
         }
         return hashes.get(0);
     }
 
+    private String computeHash() {
+        return HashUtil.applySha256(index + nonce + timestamp + merkelTreeRootHash + prevBlockHash);
+    }
+
+    /**
+     * Mine le block
+     * @param difficulty difficulté du minage
+     */
+    public void Mine(int difficulty) {
+        String tempHash = computeHash();
+        while (!(tempHash.startsWith("0".repeat(difficulty)))) {
+            ++nonce;
+            tempHash = computeHash();
+        }
+        this.hash = tempHash;
+    }
+
+    /**
+     * Mine le block avec plusieurs threads
+     * @param difficulty difficulté du minage
+     */
+    public void MineConcurrent(int difficulty) {
+        //TODO
+        String tempHash = computeHash();
+        while (!(tempHash.startsWith("0".repeat(difficulty)))) {
+            ++nonce;
+        }
+        this.hash = tempHash;
+    }
 }
