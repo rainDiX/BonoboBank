@@ -38,7 +38,7 @@ public class Block {
         return merkelTreeRootHash;
     }
 
-    public String getLastBlockHash() {
+    public String getPrevBlockHash() {
         return prevBlockHash;
     }
 
