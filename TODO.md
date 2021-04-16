@@ -1,7 +1,8 @@
 # TODO
 
 # classe transaction: 
-- Ajout des cas particulier pour la "Genesis" et l'utilisateur "Creator"
+- Ajout des cas particulier pour la "Genesis"
+- Ajout d'accesseurs pour tout les champs
 
 Info du sujet : 
 > On l’appelle bloc «génésis». Le hash de son prédécesseur est zéro, sa nonce reste à
@@ -20,7 +21,7 @@ Info du sujet :
 racines de Merkle aussi
 
 
-# Programme principal (À mettre temporairement dans bnb/Main.java)
+# Programme principal (À mettre dans bnb/Main.java)
 - Contient le main() :
 1. Création du genesis par Creator avec envoi de 50 Bnb à Creator par coinbase.
 2. Phase "Helicopter money" où coinbase envoie 50 Bnb à tous les utilisateurs user1 à userN, (pas pour Creator).
