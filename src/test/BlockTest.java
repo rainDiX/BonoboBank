@@ -6,9 +6,9 @@ import blockChain.*;
 
 public class BlockTest extends Block {
 
-    ArrayList<String> transactionListTest;
+    String[] transactionListTest;
 
-    public BlockTest(int index, String lastBlockHash, ArrayList<String> transactionList) {
+    public BlockTest(int index, String lastBlockHash, String[] transactionList) {
         super(index, lastBlockHash, transactionList);
         this.transactionListTest = transactionList;
     }
@@ -69,12 +69,12 @@ public class BlockTest extends Block {
         // the number of transaction
         ArrayList<String> hashes = new ArrayList<String>();
 
-        for (int i = 0; i < transactionListTest.size(); ++i) {
-            hashes.add(HashUtil.applySha256(transactionListTest.get(i)));
+        for (int i = 0; i < transactionListTest.length; ++i) {
+            hashes.add(HashUtil.applySha256(transactionListTest[i]));
         }
         String merkelrootHash;
-        System.out.println("Number of transactions : " + transactionListTest.size());
-        switch (transactionListTest.size()) {
+        System.out.println("Number of transactions : " + transactionListTest.length);
+        switch (transactionListTest.length) {
         case 2:
             merkelrootHash = ComputeMerkelTreeRootHashSize2(hashes);
             break;
@@ -92,7 +92,7 @@ public class BlockTest extends Block {
             break;
         default:
             merkelrootHash = "";
-            System.out.println("No test for " + transactionListTest.size() + " transactions");
+            System.out.println("No test for " + transactionListTest.length + " transactions");
         }
         System.out.println("MerkelTreeRootHash calculated    : " + super.getMerkelTreeRootHash());
         System.out.println("MerkelTreeRootHash found in test : " + merkelrootHash);
