@@ -1,4 +1,4 @@
-package bnb;
+package bcb;
 
 import blockChain.*;
 import blockchainUtils.*;
