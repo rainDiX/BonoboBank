@@ -12,7 +12,7 @@ public class Block {
     private String hash;
     private String merkelTreeRootHash;
     private String prevBlockHash;
-    private ArrayList<String> transactionList;
+    private String[] transactionList;
 
     public int getIndex() {
         return index;
@@ -23,7 +23,7 @@ public class Block {
     }
 
     public int getTransactionCount() {
-        return transactionList.size();
+        return transactionList.length;
     }
 
     public String getTimestamp() {
@@ -42,7 +42,7 @@ public class Block {
         return prevBlockHash;
     }
 
-    public ArrayList<String> getTransactionListList() {
+    public String[] getTransactionListList() {
         return transactionList;
     }
 
@@ -56,7 +56,7 @@ public class Block {
      * @param prevBlockHash   hash du block précédent
      * @param transactionList list des transactions stocké dans le block
      */
-    public Block(int index, String prevBlockHash, ArrayList<String> transactionList) {
+    public Block(int index, String prevBlockHash, String[] transactionList) {
         this.index = index;
         nonce = 0;
         this.prevBlockHash = prevBlockHash;
@@ -65,23 +65,13 @@ public class Block {
         merkelTreeRootHash = ComputeMerkelTreeRootHash();
     }
 
-    /**
-     * Constructeur du block Genesis
-     */
-    public Block() {
-        this.index = 0;
-        this.nonce = 0;
-        transactionList.add("Genesis");
-        this.timestamp = LocalDateTime.now().toString();
-    }
-
     private String ComputeMerkelTreeRootHash() {
         // The number of level in a Merkel tree is the squareroot of
         // the number of transaction
         ArrayList<String> hashes = new ArrayList<String>();
 
-        for (int i = 0; i < transactionList.size(); ++i) {
-            hashes.add(HashUtil.applySha256(transactionList.get(i)));
+        for (int i = 0; i < transactionList.length; ++i) {
+            hashes.add(HashUtil.applySha256(transactionList[i]));
         }
         while (hashes.size() != 1) {
             if ((hashes.size() % 2) != 0) {
