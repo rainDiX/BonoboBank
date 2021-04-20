@@ -10,14 +10,13 @@ Info du sujet :
 > nécessaire de le miner.
 
 # classe BlockChain
-- methode d'ajout de blocs (avec toutes les verifications que ça implique)
-
-
-# classe Block
-- Minage du bloc
+- methode d'ajout de blocs (avec toutes les verifications que ça implique) FAIT
+- getDifficulty()
+- getLastBlock();
+- getBlock(int index);
 
 # Test de validité 1 et 2
-- présence du Génésis, les ash des blocks sont cohérents, le chaînage, aussi, les
+- présence du Génésis, les hash des blocks sont cohérents, le chaînage, aussi, les
 racines de Merkle aussi
 
 
