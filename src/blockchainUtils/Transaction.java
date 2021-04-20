@@ -8,12 +8,12 @@ import miscUtils.HashUtil;
 public class Transaction {
 
 	/**
-	 * Borne sup du nombre aléatoire associé à la transaction
+	 * Borne sup du nombre aleatoire associe a� la transaction
 	 */
 	static final int MAX_VALUE = 10000;
 
 	/**
-	 * Nombre aléatoire associé à la transaction
+	 * Nombre aleatoire associé à la transaction
 	 */
 	private int randNb;
 
@@ -28,7 +28,7 @@ public class Transaction {
 	private String emetteur;
 
 	/**
-	 * Récepteur de la transaction
+	 * Recepteur de la transaction
 	 */
 	private String recepteur;
 
@@ -92,6 +92,25 @@ public class Transaction {
 	 */
 	public String calculateHash() {
 		return HashUtil.applySha256(this.toString());
+	}
+
+	public String getEmetteur() {
+		return emetteur;
+	}
+
+
+	public String getRecepteur() {
+		return recepteur;
+	}
+
+
+	public long getMontant() {
+		return montant;
+	}
+
+
+	public int getRandNb() {
+		return randNb;
 	}
 
 }
