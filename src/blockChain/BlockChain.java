@@ -19,11 +19,13 @@ public class BlockChain {
     }
 
     public boolean addBlock(Block b) {
-    	if (b.getHash().startsWith("0".repeat(this.difficulty)) && b.getPrevBlockHash()==blockList.getLast().getPrevBlockHash()) {
+    	if (blockList.isEmpty()) {
+    		blockList.add(b);
+    		return true;
+    	}else if (b.getHash().startsWith("0".repeat(this.difficulty)) && b.getPrevBlockHash()==blockList.getLast().getPrevBlockHash()){
     		blockList.add(b);
     		return true;
     	}
-    	
         return false;
     }
     
