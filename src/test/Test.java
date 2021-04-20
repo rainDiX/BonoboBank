@@ -2,6 +2,7 @@ package test;
 
 import blockchainUtils.Transaction;
 import blockchainUtils.TransactionToolkit;
+import bcb.User;
 import blockChain.*;
 
 public class Test {
@@ -25,6 +26,7 @@ public class Test {
 
     public static void miningtest(int difficulty) {
         TransactionToolkit txtk = new TransactionToolkit();
+        User u = new User("Test User");
         // test Minage de 100 blocks
         for (int i = 1; i <= 100; ++i) {
             String[] txList = new String[10];
@@ -32,7 +34,7 @@ public class Test {
                 txList[j] = txtk.Generate(100);
             }
             Block b = new BlockTest(i, "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", txList);
-            b.Mine(difficulty);
+            u.Mine(difficulty,b);
             System.out.println("Block " + i + " Nonce=" + b.getNonce() + " Hash=" + b.getHash());
         }
     }

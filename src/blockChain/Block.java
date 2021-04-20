@@ -22,6 +22,11 @@ public class Block {
         return nonce;
     }
 
+    public void setNonce(int nonce) {
+        this.nonce = nonce;
+        this.hash = computeHash();
+    }
+
     public int getTransactionCount() {
         return transactionList.length;
     }
@@ -63,6 +68,7 @@ public class Block {
         this.transactionList = transactionList;
         this.timestamp = LocalDateTime.now().toString();
         merkelTreeRootHash = ComputeMerkelTreeRootHash();
+        this.hash = computeHash();
     }
 
     private String ComputeMerkelTreeRootHash() {
@@ -92,29 +98,4 @@ public class Block {
         return HashUtil.applySha256(index + nonce + timestamp + merkelTreeRootHash + prevBlockHash);
     }
 
-    /**
-     * Mine le block
-     * @param difficulty difficulté du minage
-     */
-    public void Mine(int difficulty) {
-        String tempHash = computeHash();
-        while (!(tempHash.startsWith("0".repeat(difficulty)))) {
-            ++nonce;
-            tempHash = computeHash();
-        }
-        this.hash = tempHash;
-    }
-
-    /**
-     * Mine le block avec plusieurs threads
-     * @param difficulty difficulté du minage
-     */
-    public void MineConcurrent(int difficulty) {
-        //TODO
-        String tempHash = computeHash();
-        while (!(tempHash.startsWith("0".repeat(difficulty)))) {
-            ++nonce;
-        }
-        this.hash = tempHash;
-    }
 }
