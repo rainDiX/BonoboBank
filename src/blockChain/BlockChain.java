@@ -37,9 +37,9 @@ public class BlockChain {
 	public Block getLastBlock() {
 		return blockList.getLast();
 	}
-	
-    
-    
-  
 
+    public int getSize() {
+        return blockList.size();
+    }
+  
 }

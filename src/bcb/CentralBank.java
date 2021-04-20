@@ -64,7 +64,7 @@ public class CentralBank {
     public void asktoMine(String[] txList) {
         // un mineur est choisi au hasard
         User miner = users.get(rng.nextInt(users.size()));
-        Block toMine = new Block(blockchain.getSize(), "TODO", txList);
+        Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), txList);
         miner.Mine(blockchain.getDifficulty(), toMine);
     }
 }
