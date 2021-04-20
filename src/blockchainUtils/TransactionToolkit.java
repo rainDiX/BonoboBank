@@ -47,7 +47,11 @@ public class TransactionToolkit {
 				"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?([zZ]|([\\+-])([01]\\d|2[0-3]):?([0-5]\\d)?)? - Source : [a-zA-Z]+[0-9]* - Destination : [a-zA-Z]+[0-9]* - Montant : [0-9]+ - [0-9]+$",
 				Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(s);
-		return matcher.matches(); // TODO: cas genesis
+		return matcher.matches() || this.isGenesis(s); // TODO: cas genesis
+	}
+	
+	public boolean isGenesis(String s) {
+		return s=="Genesis";
 	}
 
 	/**

@@ -2,7 +2,7 @@
 
 # classe transaction: 
 - Ajout des cas particulier pour la "Genesis"
-- Ajout d'accesseurs pour tout les champs
+- Ajout d'accesseurs pour tout les champs FAIT
 
 Info du sujet : 
 > On l’appelle bloc «génésis». Le hash de son prédécesseur est zéro, sa nonce reste à
@@ -27,7 +27,7 @@ racines de Merkle aussi
 2. Phase "Helicopter money" où coinbase envoie 50 Bnb à tous les utilisateurs user1 à userN, (pas pour Creator).
 3. Phase de marché où les transactions sont entre deux utilisateurs choisis au hasard. On Utilise une file
 (FIFO) globale de transactions où le mineur vient se servir.
-4.  Un mineur est choisi au hasard (là Creator peut jouer). Il prend un certain nombre de transactions
+4. Un mineur est choisi au hasard (là Creator peut jouer). Il prend un certain nombre de transactions
 dans la liste globale, et crée le nouveau bloc avec les transactions sous forme de chaînes de caractères "Usern1 envoie X Bnb à Usern2"
 et ajoute une transaction où coinbase lui envoie le montant correspondant s’il est supérieur à zéro.
 5. On continue la phase de marché avec éventuellement un minage basé uniquement sur les frais de
@@ -47,6 +47,6 @@ bloc
 - sauver ou lire dans un fichier au format JSON
 - vérifier l’intégrité de la blockchain
 - sortir du programme
--  afficher la blockchain ou un bloc d’un numéro donné
+- afficher la blockchain ou un bloc d’un numéro donné
 
 

@@ -2,6 +2,7 @@ package blockChain;
 
 import java.util.LinkedList;
 
+
 public class BlockChain {
     /**
      * Difficulté de la blockchain, içi le nombre de 0 par lequel
@@ -17,8 +18,17 @@ public class BlockChain {
         this.difficulty = difficulty;
     }
 
-    public int addBlock() {
-        return 0;
+    public boolean addBlock(Block b) {
+    	if (blockList.isEmpty()) {
+    		blockList.add(b);
+    		return true;
+    	}else if (b.getHash().startsWith("0".repeat(this.difficulty)) && b.getPrevBlockHash()==blockList.getLast().getPrevBlockHash()){
+    		blockList.add(b);
+    		return true;
+    	}
+        return false;
     }
+    
+    
 
 }
