@@ -30,4 +30,16 @@ public class BlockChain {
         return false;
     }
 
+	public int getDifficulty() {
+		return this.difficulty;
+	}
+	
+	public Block getLastBlock() {
+		return blockList.getLast();
+	}
+	
+    
+    
+  
+
 }
