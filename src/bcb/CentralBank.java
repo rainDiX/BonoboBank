@@ -57,14 +57,18 @@ public class CentralBank {
             transactionQueue.add(new Transaction(this.name, users.get(i).getName(), initialReward));
         }
         while (transactionQueue.size() > 0) {
-            transactionQueue.remove();
+            // TODO
+            String[] tx = { transactionQueue.remove().toString() };
+            Block b = asktoMine(tx);
+            blockchain.addBlock(b);
         }
     }
 
-    public void asktoMine(String[] txList) {
+    public Block asktoMine(String[] txList) {
         // un mineur est choisi au hasard
         User miner = users.get(rng.nextInt(users.size()));
         Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), txList);
         miner.Mine(blockchain.getDifficulty(), toMine);
+        return toMine;
     }
 }
