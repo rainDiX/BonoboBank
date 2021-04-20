@@ -15,6 +15,7 @@ public class BlockChain {
 
     public BlockChain(int difficulty) {
         this.difficulty = difficulty;
+        this.blockList = new LinkedList<Block>();
     }
 
     public boolean addBlock(Block b) {
