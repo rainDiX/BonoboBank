@@ -2,7 +2,7 @@
 
 # classe transaction: 
 - Ajout des cas particulier pour la "Genesis"
-- Ajout d'accesseurs pour tout les champs
+- Ajout d'accesseurs pour tout les champs FAIT
 
 Info du sujet : 
 > On l’appelle bloc «génésis». Le hash de son prédécesseur est zéro, sa nonce reste à
