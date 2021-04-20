@@ -23,7 +23,7 @@ public class BlockChain {
             blockList.add(b);
             return true;
         } else if (b.getHash().startsWith("0".repeat(this.difficulty))
-                && b.getPrevBlockHash() == blockList.getLast().getPrevBlockHash() 
+                && b.getPrevBlockHash() == blockList.getLast().getHash() 
                 && b.getIndex() == blockList.size()) {
             blockList.add(b);
             return true;
