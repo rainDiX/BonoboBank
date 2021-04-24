@@ -1,5 +1,6 @@
 package bcb;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -11,28 +12,18 @@ public class TransactionToolkit {
 	/**
 	 * Generateur de transaction aléatoire
 	 *
-	 * @param userCount nombre d'utilisateur de la blockchain
+	 * @param userList liste d'utilisateur de la blockchain
 	 * @return une transaction d'un montant aléatoire entre 2 utilisateur aléatoire
 	 */
-	public String Generate(int userCount) {
+	public String Generate(ArrayList<User> userList) {
 		String emetteur;
 		String recepteur;
-		int randNb = rng.nextInt(userCount) + 2;
-		if (randNb > userCount) {
-			emetteur = "Creator";
-		} else {
-			emetteur = "user" + randNb;
-		}
-		do {
-			randNb = rng.nextInt(userCount) + 2;
-			if (randNb > userCount) {
-				recepteur = "Creator";
-			} else {
-				recepteur = "user" + randNb;
-			}
-		} while (recepteur == emetteur);
+		int emIndex = rng.nextInt(userList.size());
+		int recIndex = rng.nextInt(userList.size());
+		while (recIndex == emIndex)
+			recIndex = rng.nextInt(userList.size());
 		long montant = Math.abs(rng.nextLong());
-		Transaction tx = new Transaction(emetteur, recepteur, montant);
+		Transaction tx = new Transaction(userList.get(emIndex).getName(), userList.get(recIndex).getName(), montant);
 		return tx.toString();
 	}
 
@@ -49,9 +40,9 @@ public class TransactionToolkit {
 		Matcher matcher = pattern.matcher(s);
 		return matcher.matches() || this.isGenesis(s);
 	}
-	
+
 	public boolean isGenesis(String s) {
-		return s=="Genesis";
+		return s == "Genesis";
 	}
 
 	/**
