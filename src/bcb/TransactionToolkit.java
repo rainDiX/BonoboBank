@@ -15,16 +15,14 @@ public class TransactionToolkit {
 	 * @param userList liste d'utilisateur de la blockchain
 	 * @return une transaction d'un montant aléatoire entre 2 utilisateur aléatoire
 	 */
-	public String Generate(ArrayList<User> userList) {
-		String emetteur;
-		String recepteur;
+	public Transaction Generate(ArrayList<User> userList) {
 		int emIndex = rng.nextInt(userList.size());
 		int recIndex = rng.nextInt(userList.size());
 		while (recIndex == emIndex)
 			recIndex = rng.nextInt(userList.size());
 		long montant = Math.abs(rng.nextLong());
 		Transaction tx = new Transaction(userList.get(emIndex).getName(), userList.get(recIndex).getName(), montant);
-		return tx.toString();
+		return tx;
 	}
 
 	/**
