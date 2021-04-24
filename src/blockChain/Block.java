@@ -71,11 +71,13 @@ public class Block {
         this.hash = computeHash();
     }
 
-    private String ComputeMerkelTreeRootHash() {
+    private String ComputeMerkelTreeRootHash() throws UnsupportedOperationException {
         // The number of level in a Merkel tree is the squareroot of
         // the number of transaction
         ArrayList<String> hashes = new ArrayList<String>();
-
+        if (transactionList.length == 0){
+            throw new UnsupportedOperationException("Aucune transaction dans le block");
+        }
         for (int i = 0; i < transactionList.length; ++i) {
             hashes.add(HashUtil.applySha256(transactionList[i]));
         }
