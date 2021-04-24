@@ -122,13 +122,13 @@ public class CentralBank {
         for (int i = 1; i < users.size(); ++i) {
             transactionQueue.add(new Transaction(this.name, users.get(i).getName(), initialReward));
         }
-        injectTransactionsIntoNewBlock();
+        emptyTransactionQueue();
     }
 
     /**
      * Vide la file de trancaction en créant des nouveaux blocks
      */
-    public void injectTransactionsIntoNewBlock() {
+    public void emptyTransactionQueue() {
         while (!transactionQueue.isEmpty()) {
             /*
              * tant qu'on a des ressources dans notre liste de transactions de users, on
@@ -140,14 +140,20 @@ public class CentralBank {
         }
     }
 
+    /**
+     * Débute la phase de marché
+     * 
+     * @param blockCount nombre de bloque à miner avant l'arrêt
+     */
     public void mercatoPhase(int blockCount) {
         for (int i = 0; i < blockCount; i++) {
             /*
-             * maintenant on fait des transactions aléatoires qu'on injecte dans des nouveaux blocs
+             * maintenant on fait des transactions aléatoires qu'on injecte dans des
+             * nouveaux blocs
              */
-            int nombre_transac = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
+            int nombreTransac = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
             /* pour cela on va utiliser la queue de transactions */
-            for (int j = 0; j < nombre_transac; j++) {
+            for (int j = 0; j < nombreTransac; j++) {
                 transactionQueue.add(txtk.Generate(this.users));
             }
             /*
@@ -166,18 +172,18 @@ public class CentralBank {
     public Block asktoMine() {
         User miner = users.get(rng.nextInt(users.size()));
 
-        int taille_transac_copy_list = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
-        if (taille_transac_copy_list > transactionQueue.size()) {
+        int tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
+        if (tailleTransacListCopy > transactionQueue.size()) {
             // Si il reste moins d'élément dans la queue on injecte ce qu'il reste
-            taille_transac_copy_list = transactionQueue.size();
+            tailleTransacListCopy = transactionQueue.size();
         }
-        String[] transac_list_copy = new String[taille_transac_copy_list];
-        for (int i = 0; i < taille_transac_copy_list; i++) {
+        String[] transacListCopy = new String[tailleTransacListCopy];
+        for (int i = 0; i < tailleTransacListCopy; i++) {
             // on copie une partie de la grande liste de transaction dans la plus petite
             // pour pouvoir l'injecter dans le bloc
-            transac_list_copy[i] = transactionQueue.remove().toString();
+            transacListCopy[i] = transactionQueue.remove().toString();
         }
-        Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), transac_list_copy);
+        Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), transacListCopy);
         miner.Mine(blockchain.getDifficulty(), toMine);
         return toMine;
     }
