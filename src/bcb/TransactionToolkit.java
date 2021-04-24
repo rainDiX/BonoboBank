@@ -1,4 +1,4 @@
-package blockchainUtils;
+package bcb;
 
 import java.util.Random;
 import java.util.regex.Pattern;

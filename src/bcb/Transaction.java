@@ -1,4 +1,4 @@
-package blockchainUtils;
+package bcb;
 
 import java.time.*;
 import java.util.Random;
@@ -8,7 +8,7 @@ import miscUtils.HashUtil;
 public class Transaction {
 
 	/**
-	 * Borne sup du nombre aleatoire associe a  la transaction
+	 * Borne sup du nombre aleatoire associe aï¿½ la transaction
 	 */
 	static final int MAX_VALUE = 10000;
 

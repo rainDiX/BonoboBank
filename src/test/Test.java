@@ -1,7 +1,7 @@
 package test;
 
-import blockchainUtils.Transaction;
-import blockchainUtils.TransactionToolkit;
+import bcb.Transaction;
+import bcb.TransactionToolkit;
 import bcb.User;
 import blockChain.*;
 
