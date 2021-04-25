@@ -43,7 +43,7 @@ public class Main {
             switch (args[i]) {
             case "-b":
                 try {
-                    difficulty = Integer.parseUnsignedInt(args[i + 1]);
+                    blockCount = Integer.parseUnsignedInt(args[i + 1]);
                     ++i;
                 } catch (NumberFormatException ex) {
                     System.out.println("le nombre de block n'est pas fournis ou invalide");
