@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
+import miscUtils.*;
+
 import blockChain.*;
 
 public class CentralBank {
@@ -112,7 +114,7 @@ public class CentralBank {
         Block blockGenesis = users.get(0).createGenesisBlock();
         blockchain.addBlock(blockGenesis);
         transactionQueue.add(new Transaction(this.name, users.get(0).getName(), initialReward));
-        asktoMine();
+        blockchain.addBlock(asktoMine());
     }
 
     /**
@@ -186,5 +188,9 @@ public class CentralBank {
         Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), transacListCopy);
         miner.Mine(blockchain.getDifficulty(), toMine);
         return toMine;
+    }
+
+    public void writeJson(String filename){
+        BCJsonUtils.BCJsonWriter(this.blockchain, filename);
     }
 }

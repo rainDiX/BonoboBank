@@ -1,5 +1,6 @@
 import bcb.CentralBank;
 
+
 public class Main {
     public static void launchBCB(int difficulty, int userCount, int blockCount, long initialReward) {
         System.out.println("Difficulté du minage             : " + difficulty);
@@ -18,6 +19,8 @@ public class Main {
         coinbase.helicopterMoney();
         // Phase de marché :
         coinbase.mercatoPhase(blockCount);
+
+        coinbase.writeJson("./BC.json");
     }
 
     public static void printUsage() {
