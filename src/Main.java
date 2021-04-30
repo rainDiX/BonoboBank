@@ -12,6 +12,7 @@ public class Main {
         logr.info("Nombre d'utilisateur: " + userCount);
         logr.info("Nombre de block à miner: " + blockCount);
         logr.info("Récompense de l'helicopter money: " + initialReward + " satoBnb");
+        logr.info("Récompense de l'helicopter money: " + initialReward / 100000000l + " Bnb");
 
         CentralBank coinbase = new CentralBank("coinbase", initialReward, difficulty);
         // Genesis

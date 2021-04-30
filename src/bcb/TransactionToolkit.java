@@ -4,10 +4,16 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.logging.*;
 
 public class TransactionToolkit {
 
 	Random rng = new Random();
+
+	/**
+	 * logger pour gérer les messages de deboguage
+	 */
+	private static Logger logr = Logger.getLogger(CentralBank.class.getName());
 
 	/**
 	 * Generateur de transaction aléatoire
@@ -52,6 +58,7 @@ public class TransactionToolkit {
 
 	public Transaction Parse(String transaction) throws UnsupportedOperationException {
 		if (!isTransaction(transaction)) {
+			logr.severe("'" + transaction + "' n'est pas une transaction valide");
 			throw new UnsupportedOperationException("Malformed transaction");
 		}
 		if (isGenesis(transaction)) {
