@@ -43,11 +43,8 @@ public class BlockChain {
         return blockList.size();
     }
     
-    public Block getBlockindice(int indice) {
-    	return blockList.get(indice);
+    public Block getBlockAtIndex(int index) {
+    	return blockList.get(index);
     }
-    
-    
-    
     
 }
