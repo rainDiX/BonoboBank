@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.logging.*;
 
 import blockChain.*;
 import miscUtils.BCJsonUtils;
@@ -52,7 +53,19 @@ public class CentralBank {
      */
     private final long initialReward;
 
+    /**
+     * logger pour gérer les messages
+     */
+    private static Logger logr = Logger.getLogger(CentralBank.class.getName());
+
+    /**
+     * Instancie une CentralBank à partir d'une blockain sauvegardé dans un fichier
+     * JSON
+     * 
+     * @param filename chemin du fichier json
+     */
     public CentralBank(String filename) {
+        logr.log(Level.INFO, "Tentative de lecture du fichier " + filename);
         this.blockchain = BCJsonUtils.BCJsonReader(filename);
         // premier bloc (indice 1)
         Transaction transacTemp = txtk.Parse(this.blockchain.getBlockAtIndex(1).getTransactionListList()[0]);
@@ -96,6 +109,13 @@ public class CentralBank {
         users.add(new User("Creator"));
         this.initialReward = initialReward;
         blockchain = new BlockChain(blockchainDifficulty);
+
+        // on définit le loglevel de la console si besoin
+        if (Logger.getLogger("").getLevel() == Level.FINE) {
+            ConsoleHandler ch = new ConsoleHandler();
+            ch.setLevel(Level.FINE);
+            logr.addHandler(ch);
+        }
     }
 
     /**
@@ -120,6 +140,7 @@ public class CentralBank {
      */
     public int addUser() {
         int index = users.size();
+        logr.fine("Ajout de l'utilisateur User" + index);
         users.add(new User("User" + index));
         return index;
     }
@@ -134,6 +155,7 @@ public class CentralBank {
         if (index < users.size()) {
             return users.get(index);
         } else {
+            logr.log(Level.SEVERE, "getUser() appelé avec l'index " + index + ", nombre de users: " + users.size());
             throw new IndexOutOfBoundsException(index + " > " + users.size());
         }
     }
@@ -142,6 +164,7 @@ public class CentralBank {
      * Créer le block Genesis
      */
     public void genesis() {
+        logr.info("# GENESIS #");
         Block blockGenesis = users.get(0).createGenesisBlock();
         blockchain.addBlock(blockGenesis);
         transactionQueue.add(new Transaction(this.name, users.get(0).getName(), initialReward));
@@ -152,6 +175,7 @@ public class CentralBank {
      * Lance l'helicopter money
      */
     public void helicopterMoney() {
+        logr.info("# HELICOPTER MONEY #");
         for (int i = 1; i < users.size(); ++i) {
             transactionQueue.add(new Transaction(this.name, users.get(i).getName(), initialReward));
         }
@@ -179,6 +203,7 @@ public class CentralBank {
      * @param blockCount nombre de bloque à miner avant l'arrêt
      */
     public void mercatoPhase(int blockCount) {
+        logr.info("# MARCHÉ #");
         for (int i = 0; i < blockCount; i++) {
             /*
              * maintenant on fait des transactions aléatoires qu'on injecte dans des
@@ -204,6 +229,7 @@ public class CentralBank {
      */
     public Block asktoMine() {
         User miner = users.get(rng.nextInt(users.size()));
+        logr.fine("Demande de minage à " + miner.getName());
 
         int tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
         if (tailleTransacListCopy > transactionQueue.size()) {
@@ -218,10 +244,18 @@ public class CentralBank {
         }
         Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), transacListCopy);
         miner.Mine(blockchain.getDifficulty(), toMine);
+        logr.info("Block Miné !! : Block n°" + toMine.getIndex() + " Hash: " + toMine.getHash() + " Nonce: "
+                + toMine.getNonce());
         return toMine;
     }
 
+    /**
+     * Écrit la blockchain dans un fichier au format JSON
+     * 
+     * @param filename chemin du fichier dans lequel sauvegarder
+     */
     public void writeJson(String filename) {
+        logr.info("Écriture de la blockchain dans " + filename);
         BCJsonUtils.BCJsonWriter(this.blockchain, filename);
     }
 }

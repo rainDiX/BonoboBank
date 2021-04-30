@@ -1,11 +1,17 @@
+
+import java.util.logging.*;
+
 import bcb.CentralBank;
 
 public class Main {
-    public static void launchBCB(int difficulty, int userCount, int blockCount, long initialReward, boolean saving, String filename) {
-        System.out.println("Difficulté du minage             : " + difficulty);
-        System.out.println("Nombre d'utilisateur             : " + userCount);
-        System.out.println("Nombre de block à miner          : " + blockCount);
-        System.out.println("Récompense de l'helicopter money : " + initialReward + " satoBnb");
+
+    public static void launchBCB(int difficulty, int userCount, int blockCount, long initialReward, boolean saving,
+            String filename) {
+        Logger logr = Logger.getLogger("launchBCB");
+        logr.info("difficulté du minage: " + difficulty);
+        logr.info("Nombre d'utilisateur: " + userCount);
+        logr.info("Nombre de block à miner: " + blockCount);
+        logr.info("Récompense de l'helicopter money: " + initialReward + " satoBnb");
 
         CentralBank coinbase = new CentralBank("coinbase", initialReward, difficulty);
         // Genesis
@@ -39,7 +45,7 @@ public class Main {
         System.out.println("-s fichier.json : fichier où sauvegarder la blockchain à la fin");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         boolean opening = false;
         boolean saving = false;
         boolean helpflag = false;
@@ -51,9 +57,16 @@ public class Main {
         // nombre d'utilisateur
         int userCount = 10;
 
-        for (int i = 0; i < args.length - 1; ++i) {
+        Logger rootLogr = Logger.getLogger("");
+        rootLogr.setLevel(Level.SEVERE);
+
+        for (int i = 0; i < args.length; ++i) {
             switch (args[i]) {
                 case "-b":
+                    if (i + 1 == args.length) {
+                        printUsage();
+                        throw new Exception("Argument manquant");
+                    }
                     try {
                         blockCount = Integer.parseUnsignedInt(args[i + 1]);
                         ++i;
@@ -63,6 +76,10 @@ public class Main {
                     }
                     break;
                 case "-d":
+                    if (i + 1 == args.length) {
+                        printUsage();
+                        throw new Exception("Argument manquant");
+                    }
                     try {
                         difficulty = Integer.parseUnsignedInt(args[i + 1]);
                         ++i;
@@ -72,6 +89,10 @@ public class Main {
                     }
                     break;
                 case "-r":
+                    if (i + 1 == args.length) {
+                        printUsage();
+                        throw new Exception("Argument manquant");
+                    }
                     try {
                         int montantBnb = Integer.parseUnsignedInt(args[i + 1]);
                         initialReward = montantBnb * 100000000l;
@@ -82,6 +103,10 @@ public class Main {
                     }
                     break;
                 case "-u":
+                    if (i + 1 == args.length) {
+                        printUsage();
+                        throw new Exception("Argument manquant");
+                    }
                     try {
                         userCount = Integer.parseUnsignedInt(args[i + 1]);
                         ++i;
@@ -91,16 +116,30 @@ public class Main {
                     }
                     break;
                 case "-s":
-                    filename = args[i+1];
+                    if (i + 1 == args.length) {
+                        printUsage();
+                        throw new Exception("Argument manquant");
+                    }
+                    filename = args[i + 1];
                     saving = true;
+                    ++i;
                     break;
                 case "-f":
-                    filename = args[i+1];
+                    if (i + 1 == args.length) {
+                        printUsage();
+                        throw new Exception("Argument manquant");
+                    }
+                    filename = args[i + 1];
                     opening = true;
+                case "-v":
+                    rootLogr.setLevel(Level.INFO);
+                    break;
+                case "-vv":
+                    rootLogr.setLevel(Level.FINE);
                     break;
             }
         }
-        if ( helpflag || (opening && saving)){
+        if (helpflag || (opening && saving)) {
             printUsage();
         } else if (opening) {
             openBCB(filename);
