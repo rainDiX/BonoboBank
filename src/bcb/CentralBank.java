@@ -5,12 +5,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
-<<<<<<< HEAD
 import blockChain.*;
 import miscUtils.BCJsonUtils;
-=======
-import miscUtils.*;
->>>>>>> 086b303ab00245c4487514a826c58abf094e88b3
 
 import blockChain.*;
 
