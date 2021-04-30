@@ -1,16 +1,21 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
             "type": "java",
-            "name": "Launch Main",
+            "name": "Launch Main Writing to a file",
             "request": "launch",
             "mainClass": "Main",
             "projectName": "BonoboBank",
-            "args": "-d 5 -b 1000 -u 100"
+            "args": "-d 4 -b 1000 -u 100 -s test4.json"
+        },
+        {
+            "type": "java",
+            "name": "Launch Main Opening a file",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "BonoboBank",
+            "args": "-f test4.json"
         },
         {
             "type": "java",
