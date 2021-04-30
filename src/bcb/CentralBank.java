@@ -1,33 +1,96 @@
 package bcb;
 
 import java.util.ArrayList;
-
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
 import blockChain.*;
-import blockchainUtils.*;
+import miscUtils.BCJsonUtils;
 
 public class CentralBank {
-
+    /**
+     * nom de la banque
+     */
     public String name;
-    
-    private final int MAX_TRANSAC_PER_BLOC =10;
 
+    /**
+     * Nombre maximum de transaction par block
+     */
+    private final int MAX_TRANSAC_PER_BLOC = 10;
+
+    /**
+     * Utilisateur/mineurs de la blockchain
+     */
     private ArrayList<User> users;
 
+    /**
+     * La blockchain
+     */
     private BlockChain blockchain;
 
+    /**
+     * Queue de transaction
+     * <p>
+     * Les mineurs vont piocher dans cette liste pour miner des blocks
+     * <p>
+     */
     private Queue<Transaction> transactionQueue = new LinkedList<Transaction>();
 
-    //private TransactionToolkit txtk = new TransactionToolkit();
+    /**
+     * Contient une méthode pour génerer des transactions aléatoire
+     */
+    private TransactionToolkit txtk = new TransactionToolkit();
 
+    /**
+     * Générateur de nombre aléatoire
+     */
     private Random rng = new Random();
 
+    /**
+     * Récompense attribué lors de l'hélicopter maney
+     */
     private final long initialReward;
 
-    public CentralBank(String name, long initialReward ,int blockchainDifficulty) {
+    public CentralBank(String filename) {
+        this.blockchain = BCJsonUtils.BCJsonReader(filename);
+        // premier bloc (indice 1)
+        Transaction transacTemp = txtk.Parse(this.blockchain.getBlockAtIndex(1).getTransactionListList()[0]);
+        // on récupère l'initial reward
+        this.initialReward = transacTemp.getMontant();
+
+        users = new ArrayList<User>();
+
+        for (int i = 2; i < this.blockchain.getSize(); i++) {
+            for (int j = 0; j < this.blockchain.getBlockAtIndex(i)
+                    .getTransactionCount(); j++) {/* on parcourt les blocks de la blockchain */
+                /*
+                 * on vérifie pour chaque transaction qui se trouve dans le bloc, si l'émetteur
+                 * et le recepteur sont enregistrés dans la base de données
+                 */
+                User userTemp1 = new User(
+                        txtk.Parse(this.blockchain.getBlockAtIndex(1).getTransactionListList()[j]).getEmetteur());
+                User userTemp2 = new User(
+                        txtk.Parse(this.blockchain.getBlockAtIndex(1).getTransactionListList()[j]).getRecepteur());
+                /* et si ils ne le sont pas, on les ajoute */
+                if (!users.contains(userTemp1)) {
+                    users.add(userTemp1);
+                }
+                if (!users.contains(userTemp2)) {
+                    users.add(userTemp2);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 
+     * @param name                 Nom de la banque
+     * @param initialReward        récompense de l'helicapter money
+     * @param blockchainDifficulty difficulté de minage
+     */
+    public CentralBank(String name, long initialReward, int blockchainDifficulty) {
         this.name = name;
         users = new ArrayList<User>();
         users.add(new User("Creator"));
@@ -35,63 +98,130 @@ public class CentralBank {
         blockchain = new BlockChain(blockchainDifficulty);
     }
 
+    /**
+     * @return le nombre d'utilisateur
+     */
     public int getUserCount() {
         return users.size();
     }
 
+    /**
+     * 
+     * @return le nom de la banque
+     */
     public String getName() {
         return name;
     }
 
-    public void addUser() {
+    /**
+     * Ajoute un utilisateur
+     * 
+     * @return l'index de l'utilisateur ajouté
+     */
+    public int addUser() {
         int index = users.size();
         users.add(new User("User" + index));
+        return index;
     }
 
+    /**
+     * 
+     * @param index index de l'utilisateur
+     * @return utilisateur demandé
+     * @throws IndexOutOfBoundsException
+     */
+    public User getUser(int index) throws IndexOutOfBoundsException {
+        if (index < users.size()) {
+            return users.get(index);
+        } else {
+            throw new IndexOutOfBoundsException(index + " > " + users.size());
+        }
+    }
+
+    /**
+     * Créer le block Genesis
+     */
     public void genesis() {
         Block blockGenesis = users.get(0).createGenesisBlock();
         blockchain.addBlock(blockGenesis);
-        String[] firstTx = { (new Transaction(this.name, users.get(0).getName(), initialReward)).toString() };
-        asktoMine(firstTx);
+        transactionQueue.add(new Transaction(this.name, users.get(0).getName(), initialReward));
+        blockchain.addBlock(asktoMine());
     }
 
+    /**
+     * Lance l'helicopter money
+     */
     public void helicopterMoney() {
-        for (int i = 1; i < users.size(); ++i ) {
+        for (int i = 1; i < users.size(); ++i) {
             transactionQueue.add(new Transaction(this.name, users.get(i).getName(), initialReward));
         }
-        injectTransactionsIntoNewBlock();
+        emptyTransactionQueue();
     }
 
-    
-    public void injectTransactionsIntoNewBlock() {
-    	while (transactionQueue.size()>=MAX_TRANSAC_PER_BLOC) { /* tant qu'on a des ressources dans notre liste de 
-    	transactions de users, on peut donner la taille qu'on veut à la liste de transaction qui va se trouver dans chaque bloc*/
-    		int taille_transac_copy_list=rng.nextInt(MAX_TRANSAC_PER_BLOC);
-    		String[] transac_list_copy_=new String[taille_transac_copy_list];
-    		for (int i=0;i<taille_transac_copy_list;i++) {/* on copie une partie de la grande liste de transaction dans la plus 
-    		petite pour pouvoir l'injecter dans le bloc*/
-    			transac_list_copy_[i]=transactionQueue.remove().toString();
-    		}
-    		Block b = asktoMine(transac_list_copy_);
+    /**
+     * Vide la file de trancaction en créant des nouveaux blocks
+     */
+    public void emptyTransactionQueue() {
+        while (!transactionQueue.isEmpty()) {
+            /*
+             * tant qu'on a des ressources dans notre liste de transactions de users, on
+             * peut donner la taille qu'on veut à la liste de transaction qui va se trouver
+             * dans chaque bloc
+             */
+            Block b = asktoMine();
             blockchain.addBlock(b);
-    	}
-    	if (!transactionQueue.isEmpty()) {/*  si il reste des éléments dans la grande file de 
-    	transactions, on les injecte tous dans un dernier bloc*/
-    		String[] transac_list_copy_=new String[transactionQueue.size()];
-    		for (int i=0;i<transactionQueue.size();i++) {
-    			transac_list_copy_[i]=transactionQueue.remove().toString();
-    		}
-    		Block b = asktoMine(transac_list_copy_);
-            blockchain.addBlock(b);
-    	}
+        }
     }
-    
-    
-    public Block asktoMine(String[] txList) {
-        // un mineur est choisi au hasard
+
+    /**
+     * Débute la phase de marché
+     * 
+     * @param blockCount nombre de bloque à miner avant l'arrêt
+     */
+    public void mercatoPhase(int blockCount) {
+        for (int i = 0; i < blockCount; i++) {
+            /*
+             * maintenant on fait des transactions aléatoires qu'on injecte dans des
+             * nouveaux blocs
+             */
+            int nombreTransac = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
+            /* pour cela on va utiliser la queue de transactions */
+            for (int j = 0; j < nombreTransac; j++) {
+                transactionQueue.add(txtk.Generate(this.users));
+            }
+            /*
+             * une fois des transactions ajoutées on mine un bloc
+             */
+            Block b = asktoMine();
+            blockchain.addBlock(b);
+        }
+    }
+
+    /**
+     * Choisit un mineur au hasard et lui demande de miner un block
+     * 
+     * @return un block miné
+     */
+    public Block asktoMine() {
         User miner = users.get(rng.nextInt(users.size()));
-        Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), txList);
+
+        int tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
+        if (tailleTransacListCopy > transactionQueue.size()) {
+            // Si il reste moins d'élément dans la queue on injecte ce qu'il reste
+            tailleTransacListCopy = transactionQueue.size();
+        }
+        String[] transacListCopy = new String[tailleTransacListCopy];
+        for (int i = 0; i < tailleTransacListCopy; i++) {
+            // on copie une partie de la grande liste de transaction dans la plus petite
+            // pour pouvoir l'injecter dans le bloc
+            transacListCopy[i] = transactionQueue.remove().toString();
+        }
+        Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), transacListCopy);
         miner.Mine(blockchain.getDifficulty(), toMine);
         return toMine;
+    }
+
+    public void writeJson(String filename) {
+        BCJsonUtils.BCJsonWriter(this.blockchain, filename);
     }
 }

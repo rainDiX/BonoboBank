@@ -1,0 +1,41 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Main Writing to a file",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "BonoboBank",
+            "args": "-d 4 -b 1000 -u 100 -s test4.json"
+        },
+        {
+            "type": "java",
+            "name": "Launch Main Opening a file",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "BonoboBank",
+            "args": "-f test4.json"
+        },
+        {
+            "type": "java",
+            "name": "Launch WelcomeWindow",
+            "request": "launch",
+            "mainClass": "gui.WelcomeWindow",
+            "projectName": "BonoboBank"
+        },
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch Test",
+            "request": "launch",
+            "mainClass": "test.Test",
+            "projectName": "BonoboBank"
+        }
+    ]
+}
