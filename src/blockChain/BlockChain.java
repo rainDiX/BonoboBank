@@ -42,5 +42,12 @@ public class BlockChain {
     public int getSize() {
         return blockList.size();
     }
-  
+    
+    public Block getBlockindice(int indice) {
+    	return blockList.get(indice);
+    }
+    
+    
+    
+    
 }

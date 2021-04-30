@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.Random;
 
 import blockChain.*;
+import miscUtils.BCJsonUtils;
 
 
 public class CentralBank {
@@ -26,6 +27,30 @@ public class CentralBank {
     private Random rng = new Random();
 
     private final long initialReward;
+    
+    public CentralBank(String filename) {
+    	BCJsonUtils.BCJsonWriter(this.blockchain, filename);
+    	//premier bloc (indice 1)
+    	Transaction transacTemp=txtk.Parse(this.blockchain.getBlockindice(1).getTransactionListList()[0]);
+    	//on récupère l'initial reward
+    	this.initialReward=transacTemp.getMontant();
+    	for (int i=2;i<this.blockchain.getSize();i++) {
+    		for (int j=0;j<this.blockchain.getBlockindice(i).getTransactionCount();j++) {/* on parcourt les blocks de la blockchain */
+    			/* on vérifie pour chaque transaction qui se trouve dans le bloc, si l'émetteur et le recepteur sont enregistrés dans la base de données */
+    			User userTemp1=new User(txtk.Parse(this.blockchain.getBlockindice(1).getTransactionListList()[j]).getEmetteur());
+    			User userTemp2=new User(txtk.Parse(this.blockchain.getBlockindice(1).getTransactionListList()[j]).getRecepteur());
+    			/* et si ils ne le sont pas, on les ajoute*/
+    			if (!users.contains(userTemp1)) {
+    				users.add(userTemp1);
+    			}
+    			if (!users.contains(userTemp2)) {
+    				users.add(userTemp2);
+    			}
+    		}
+    		
+    	}
+    			
+    }
 
     public CentralBank(String name, long initialReward ,int blockchainDifficulty) {
         this.name = name;
