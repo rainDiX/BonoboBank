@@ -48,30 +48,39 @@ public class User {
     }
 
     private String computeBlockHash(Block b, int nonce) {
-        return HashUtil.applySha256(b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
+        return HashUtil.applySha256(
+                b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
     }
 
     /**
      * Mine le block
      * 
      * @param difficulty difficulté du minage
-     * @param toMine block à Miner
+     * @param toMine     block à Miner
      */
     public void Mine(int difficulty, Block toMine) {
         int nonce = 0;
-        String tempHash = computeBlockHash(toMine,nonce);
+        String tempHash = computeBlockHash(toMine, nonce);
         while (!(tempHash.startsWith("0".repeat(difficulty)))) {
             ++nonce;
-            tempHash = computeBlockHash(toMine,nonce);
+            tempHash = computeBlockHash(toMine, nonce);
         }
         toMine.setNonce(nonce);
     }
 
-	@Override
-	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
-		User uuser=(User) obj;
-		return uuser.name==this.name;
-	}
-    
+    @Override
+    public boolean equals(Object obj) {
+        // On compare avec lui-même
+        if (obj == this) {
+            return true;
+        }
+        // Si ce n'est pas un user retourne faux
+        if (!(obj instanceof User)) {
+            return false;
+        }
+
+        User user = (User) obj;
+        return user.getName().equals(this.name);
+    }
+
 }
