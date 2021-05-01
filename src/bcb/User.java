@@ -67,4 +67,11 @@ public class User {
         toMine.setNonce(nonce);
     }
 
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		User uuser=(User) obj;
+		return uuser.name==this.name;
+	}
+    
 }

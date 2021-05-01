@@ -23,7 +23,7 @@ public class CentralBank {
     /**
      * Utilisateur/mineurs de la blockchain
      */
-    private ArrayList<User> users;
+    private ArrayList<User> users = new ArrayList<User>();
 
     /**
      * La blockchain
@@ -71,9 +71,9 @@ public class CentralBank {
         Transaction transacTemp = txtk.Parse(this.blockchain.getBlockAtIndex(1).getTransactionListList()[0]);
         // on récupère l'initial reward
         this.initialReward = transacTemp.getMontant();
-
-        users = new ArrayList<User>();
-
+        this.name=transacTemp.getEmetteur();
+        /* ArrayList<String> UsersString=new ArrayList<String>();*/
+        
         for (int i = 2; i < this.blockchain.getSize(); i++) {
             for (int j = 0; j < this.blockchain.getBlockAtIndex(i)
                     .getTransactionCount(); j++) {/* on parcourt les blocks de la blockchain */
@@ -81,20 +81,33 @@ public class CentralBank {
                  * on vérifie pour chaque transaction qui se trouve dans le bloc, si l'émetteur
                  * et le recepteur sont enregistrés dans la base de données
                  */
-                User userTemp1 = new User(
-                        txtk.Parse(this.blockchain.getBlockAtIndex(1).getTransactionListList()[j]).getEmetteur());
-                User userTemp2 = new User(
-                        txtk.Parse(this.blockchain.getBlockAtIndex(1).getTransactionListList()[j]).getRecepteur());
+                User userTemp1 = new User (txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getEmetteur());
+                User userTemp2 = 
+                        new User (txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getRecepteur());
                 /* et si ils ne le sont pas, on les ajoute */
-                if (!users.contains(userTemp1)) {
-                    users.add(userTemp1);
+                /*
+                int index=UsersString.indexOf(userTemp1);
+                if (index==-1 && !userTemp1.equals(this.name)) {
+                    UsersString.add(userTemp1);
                 }
-                if (!users.contains(userTemp2)) {
-                    users.add(userTemp2);
+                index=UsersString.indexOf(userTemp2);
+                if (index==-1 && !userTemp2.equals(this.name)) {
+                    UsersString.add(userTemp2);
+                }*/
+                if (!this.users.contains(userTemp1) && !userTemp1.getName().equals(this.name)) {
+                	this.users.add(userTemp1);
+                }
+                if (!this.users.contains(userTemp2) && !userTemp2.getName().equals(this.name)) {
+                	this.users.add(userTemp2);
                 }
             }
         }
-
+        /*for (String element : UsersString) {
+        	User userTemp= new User (element);
+        	this.users.add(userTemp);
+        }
+    
+        logr.info("importation terminée");*/
     }
 
     /**
@@ -105,7 +118,7 @@ public class CentralBank {
      */
     public CentralBank(String name, long initialReward, int blockchainDifficulty) {
         this.name = name;
-        users = new ArrayList<User>();
+        
         users.add(new User("Creator"));
         this.initialReward = initialReward;
         blockchain = new BlockChain(blockchainDifficulty);
