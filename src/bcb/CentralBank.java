@@ -243,7 +243,7 @@ public class CentralBank {
             transacListCopy[i] = transactionQueue.remove().toString();
         }
         Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), transacListCopy);
-        miner.Mine(blockchain.getDifficulty(), toMine);
+        miner.Mine2(blockchain.getDifficulty(), toMine);
         logr.info("Block Miné !! : Block n°" + toMine.getIndex() + " Hash: " + toMine.getHash() + " Nonce: "
                 + toMine.getNonce());
         return toMine;
