@@ -7,7 +7,7 @@
             "request": "launch",
             "mainClass": "Main",
             "projectName": "BonoboBank",
-            "args": "-d 4 -b 1000 -u 100 -s test4.json"
+            "args": "-d 4 -b 1000 -u 666 -s test4.json -v"
         },
         {
             "type": "java",

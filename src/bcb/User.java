@@ -1,15 +1,12 @@
 package bcb;
 
-
 /* Import lié à l'execution concurrente */
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 /* fin Import execution concurrente */
 
 import blockChain.Block;
@@ -70,48 +67,6 @@ public class User {
      * @param difficulty difficulté du minage
      * @param toMine     block à Miner
      */
-    public void Mine2(int difficulty, Block toMine) {
-        int threadCount = Runtime.getRuntime().availableProcessors() + 1;
-        // Executor avec ncoeurs+1 threads
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        List<Future<ComputeBlockResult>> list = new ArrayList<Future<ComputeBlockResult>>();
-        Future<ComputeBlockResult> res;
-        int nonce = 0;
-        List<ComputeBlockHash> tasks = new ArrayList<ComputeBlockHash>();
-
-        // On ajoute des task à la liste
-        for (int i = nonce; i < nonce + threadCount; ++i) {
-            ComputeBlockHash compute = new ComputeBlockHash(toMine, nonce + i, threadCount, difficulty);
-            tasks.add(compute);
-        }
-
-        for (ComputeBlockHash task : tasks) {
-            task.start();
-        }
-        // on les executent en parallèle
-        try {
-            list = executor.invokeAll(tasks);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // On prend le résultat du premier fini
-        // Traitement des résultat obtenus
-        for (Future<ComputeBlockResult> fut : list) {
-            try {
-                ComputeBlockResult res = fut.get();
-                String tempHash = res.getHash();
-                // System.out.println("Nonce: " + res.nonce + " Hash : " + tempHash);
-                nonce = res.getNonce();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-        // on vide la liste des taches
-        tasks.clear();
-        toMine.setNonce(nonce);
-    }
-
     public void Mine(int difficulty, Block toMine) {
         int nonce = 0;
         String tempHash = computeBlockHash(toMine, nonce);
@@ -122,65 +77,69 @@ public class User {
         toMine.setNonce(nonce);
     }
 
-}
+    public void Mine2(int difficulty, Block toMine) {
+        boolean finished = false;
+        int nonce = 0;
+        int threadCount = Runtime.getRuntime().availableProcessors() + 1;
+        // Executor avec ncoeurs+1 threads
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        ExecutorCompletionService<Integer> completionService = new ExecutorCompletionService<Integer>(executor);
 
-/**
- * Tuple résultat (nonce,hash)
- */
-class ComputeBlockResult {
-    String hash;
-    int nonce;
-
-    public ComputeBlockResult(String hash, int nonce) {
-        this.nonce = nonce;
-        this.hash = hash;
+        // On lance des tasks en parallele
+        for (int i = nonce; i < nonce + threadCount; ++i) {
+            ComputeBlockHash compute = new ComputeBlockHash(toMine, nonce + i, difficulty, threadCount);
+            completionService.submit(compute);
+        }
+        // on prends le 1er resultat arrivé
+        while (!finished) {
+            try {
+                Future<Integer> future = completionService.poll();
+                if (future != null) {
+                    int firstResult = future.get();
+                    nonce = firstResult;
+                    finished = true;
+                }
+            } catch (NullPointerException | InterruptedException | ExecutionException ex) {
+                System.err.println(ex.getMessage());
+            }
+        }
+        // On quitte tout les threads restant
+        executor.shutdownNow();
+        toMine.setNonce(nonce);
     }
 
-    public String getHash() {
-        return this.hash;
-    }
-
-    public int getNonce() {
-        return this.nonce;
-    }
 }
 
 /**
  * classe callable permettant l'exacution en parrallèle
  */
-class ComputeBlockHash implements Callable<ComputeBlockResult> {
-
+class ComputeBlockHash implements Callable<Integer> {
     // volatile for multi-threaded reasons
     protected volatile int nonce = 0;
     protected volatile Block b;
     protected volatile int offset = 0;
     protected volatile int difficulty = 0;
-    // to stop the thread
-    private boolean exit;
 
     public ComputeBlockHash(Block b, int nonce, int difficulty, int offset) {
         this.nonce = nonce;
         this.offset = offset;
         this.difficulty = difficulty;
         this.b = b;
-        
     }
 
     @Override
-    public ComputeBlockResult call() {
-        String hash = HashUtil.applySha256(
-                b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
-        while ( !exit && hash.startsWith("0".repeat(difficulty))) {
-            nonce += offset;
-            hash = HashUtil.applySha256(
+    public Integer call() throws Exception {
+            String hash = HashUtil.applySha256(
                     b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
-        }
-        return new ComputeBlockResult(hash, nonce);
+            while (!hash.startsWith("0".repeat(difficulty))) {
+                // On arrête tout si le thread est interrompu
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException(); 
+                }
+                nonce += offset;
+                hash = HashUtil.applySha256(
+                        b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
+            }
+            return nonce;
     }
-
-    public void stop()
-    {
-        exit = true;
-    }
-
 }
