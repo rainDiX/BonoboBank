@@ -33,6 +33,7 @@ public class Main {
 
     public static void openBCB(String filename) {
         CentralBank bcb = new CentralBank(filename);
+        
         System.out.println(bcb.getName());
     }
 

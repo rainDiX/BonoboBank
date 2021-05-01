@@ -108,6 +108,21 @@ public class User {
         toMine.setNonce(nonce);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        // On compare avec lui-même
+        if (obj == this) {
+            return true;
+        }
+        // Si ce n'est pas un user retourne faux
+        if (!(obj instanceof User)) {
+            return false;
+        }
+
+        User user = (User) obj;
+        return user.getName().equals(this.name);
+    }
+
 }
 
 /**
