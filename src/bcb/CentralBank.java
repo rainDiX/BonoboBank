@@ -84,16 +84,7 @@ public class CentralBank {
                 User userTemp1 = new User (txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getEmetteur());
                 User userTemp2 = 
                         new User (txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getRecepteur());
-                /* et si ils ne le sont pas, on les ajoute */
-                /*
-                int index=UsersString.indexOf(userTemp1);
-                if (index==-1 && !userTemp1.equals(this.name)) {
-                    UsersString.add(userTemp1);
-                }
-                index=UsersString.indexOf(userTemp2);
-                if (index==-1 && !userTemp2.equals(this.name)) {
-                    UsersString.add(userTemp2);
-                }*/
+                
                 if (!this.users.contains(userTemp1) && !userTemp1.getName().equals(this.name)) {
                 	this.users.add(userTemp1);
                 }
@@ -102,12 +93,6 @@ public class CentralBank {
                 }
             }
         }
-        /*for (String element : UsersString) {
-        	User userTemp= new User (element);
-        	this.users.add(userTemp);
-        }
-    
-        logr.info("importation terminée");*/
     }
 
     /**
