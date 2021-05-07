@@ -61,6 +61,21 @@ public class User {
                 b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        // On compare avec lui-même
+        if (obj == this) {
+            return true;
+        }
+        // Si ce n'est pas un user retourne faux
+        if (!(obj instanceof User)) {
+            return false;
+        }
+
+        User user = (User) obj;
+        return user.getName().equals(this.name);
+    }
+
     /**
      * Mine le block
      * 
@@ -77,16 +92,22 @@ public class User {
         toMine.setNonce(nonce);
     }
 
+    /**
+     * Mine le block avec plusieur threads
+     * 
+     * @param difficulty difficulté du minage
+     * @param toMine     block à Miner
+     */
     public void Mine2(int difficulty, Block toMine) {
         boolean finished = false;
         int nonce = 0;
-        int threadCount = Runtime.getRuntime().availableProcessors() + 1;
-        // Executor avec ncoeurs+1 threads
+        int threadCount = Runtime.getRuntime().availableProcessors();
+        // Executor avec ncoeurs threads
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         ExecutorCompletionService<Integer> completionService = new ExecutorCompletionService<Integer>(executor);
 
         // On lance des tasks en parallele
-        for (int i = nonce; i < nonce + threadCount; ++i) {
+        for (int i = 0; i < threadCount; ++i) {
             ComputeBlockHash compute = new ComputeBlockHash(toMine, nonce + i, difficulty, threadCount);
             completionService.submit(compute);
         }
@@ -108,32 +129,16 @@ public class User {
         toMine.setNonce(nonce);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        // On compare avec lui-même
-        if (obj == this) {
-            return true;
-        }
-        // Si ce n'est pas un user retourne faux
-        if (!(obj instanceof User)) {
-            return false;
-        }
-
-        User user = (User) obj;
-        return user.getName().equals(this.name);
-    }
-
 }
 
 /**
- * classe callable permettant l'exacution en parrallèle
+ * classe callable permettant l'execution en parrallèle
  */
 class ComputeBlockHash implements Callable<Integer> {
-    // volatile for multi-threaded reasons
-    protected volatile int nonce = 0;
-    protected volatile Block b;
-    protected volatile int offset = 0;
-    protected volatile int difficulty = 0;
+    protected int nonce = 0;
+    protected Block b;
+    protected int offset = 0;
+    protected int difficulty = 0;
 
     public ComputeBlockHash(Block b, int nonce, int difficulty, int offset) {
         this.nonce = nonce;
