@@ -10,21 +10,21 @@ import java.util.concurrent.ExecutorCompletionService;
 /* fin Import execution concurrente */
 
 import blockChain.Block;
+import blockChain.BlockChain;
 import miscUtils.HashUtil;
 
 public class User {
-    /**
-     * Portefeuille de l'utilisateur en satoBnb
-     */
-    private long wallet = 0;
 
     /**
      * Nom de l'utilisateur
      */
     private String name;
 
-    public User(String name) {
+    private CentralBank bank;
+
+    public User(String name, CentralBank bank) {
         this.name = name;
+        this.bank = bank;
     }
 
     /**
@@ -37,17 +37,18 @@ public class User {
     }
 
     /**
-     * @return solde du compte en satoBnb
+     * @return solde du compte en satoBnb (O(n))
      */
     public long getBalance() {
-        return wallet;
+        long balance = 0;
+        return balance;
     }
 
     /**
-     * @return solde du compte en Bnb
+     * @return solde du compte en Bnb (O(n))
      */
-    public int getBalanceBnb() {
-        return (int) (wallet / 100000000);
+    public long getBalanceBnb() {
+        return (this.getBalance() / 100000000);
     }
 
     protected Block createGenesisBlock() {
@@ -98,7 +99,7 @@ public class User {
      * @param difficulty difficulté du minage
      * @param toMine     block à Miner
      */
-    public void Mine2(int difficulty, Block toMine) {
+    public void MineConcurrent(int difficulty, Block toMine) {
         boolean finished = false;
         int nonce = 0;
         int threadCount = Runtime.getRuntime().availableProcessors();

@@ -87,9 +87,9 @@ public class CentralBank {
                  * et le recepteur sont enregistrés dans la base de données
                  */
                 User userTemp1 = new User(
-                        txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getEmetteur());
+                        txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getEmetteur(), this);
                 User userTemp2 = new User(
-                        txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getRecepteur());
+                        txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getRecepteur(), this);
 
                 if (!this.users.contains(userTemp1) && !userTemp1.getName().equals(this.name)) {
                     this.users.add(userTemp1);
@@ -110,7 +110,7 @@ public class CentralBank {
     public CentralBank(String name, long initialReward, int blockchainDifficulty) {
         this.name = name;
 
-        users.add(new User("Creator"));
+        users.add(new User("Creator", this));
         this.reward = initialReward;
         blockchain = new BlockChain(blockchainDifficulty);
 
@@ -145,7 +145,7 @@ public class CentralBank {
     public String addUser() {
         int index = users.size();
         logr.fine("Ajout de l'utilisateur User" + index);
-        users.add(new User("User" + index));
+        users.add(new User("User" + index, this));
         return users.get(index).getName();
     }
 
@@ -278,7 +278,7 @@ public class CentralBank {
             transacList[transacList.length - 1] = new Transaction("coinbase", miner.getName(), reward).toString();
         }
         Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), transacList);
-        miner.Mine2(blockchain.getDifficulty(), toMine);
+        miner.MineConcurrent(blockchain.getDifficulty(), toMine);
         logr.info("Block Miné !! : Block n°" + toMine.getIndex() + " Hash: " + toMine.getHash() + " Nonce: "
                 + toMine.getNonce());
         return toMine;

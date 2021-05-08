@@ -18,7 +18,7 @@ public class Test {
     public static void transactionToolkitTest() {
         var u = new ArrayList<User>();
         for (int i = 1; i <= 100; ++i) {
-            u.add(new User("User" + i));
+            u.add(new User("User" + i, null));
         }
         TransactionToolkit txtk = new TransactionToolkit();
         for (int i = 0; i < 200; ++i) {
@@ -33,10 +33,10 @@ public class Test {
     public static void miningtest(int difficulty) {
         var uL = new ArrayList<User>();
         for (int i = 1; i <= 100; ++i) {
-            uL.add(new User("User" + i));
+            uL.add(new User("User" + i, null));
         }
         TransactionToolkit txtk = new TransactionToolkit();
-        User u = new User("Test User");
+        User u = new User("Test User", null);
         // test Minage de 100 blocks
         for (int i = 1; i <= 100; ++i) {
             String[] txList = new String[10];
@@ -54,7 +54,7 @@ public class Test {
         String[] txList;
         var u = new ArrayList<User>();
         for (int i = 1; i <= 100; ++i) {
-            u.add(new User("User" + i));
+            u.add(new User("User" + i, null));
         }
 
         // 2 tx
