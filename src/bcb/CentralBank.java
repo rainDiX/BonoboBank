@@ -82,6 +82,8 @@ public class CentralBank implements Iterable<Transaction> {
         // on récupère l'initial reward
         this.reward = transacTemp.getMontant();
         this.name = transacTemp.getEmetteur();
+        // on récupère Creator
+        this.users.add(new User(transacTemp.getRecepteur(), this));
 
         while (it.hasNext()) {
             Block block = it.next();
@@ -266,20 +268,15 @@ public class CentralBank implements Iterable<Transaction> {
         if (blockchain.getSize() % DECREASE_REWARD == 0) {
             reward = reward / 2;
         }
-        int tailleTransacListCopy;
-        if (reward > 0) {
-            // On garde une transaction de libre pour la récompense
-            // pas de frais pour les tx en V1
-            tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC - 1) + 1;
-        } else {
-            tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
-        }
+        int tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
 
-        if (tailleTransacListCopy > transactionQueue.size() && reward == 0) {
+        if (tailleTransacListCopy > transactionQueue.size()) {
             // Si il reste moins d'élément dans la queue on injecte ce qu'il reste
             tailleTransacListCopy = transactionQueue.size();
-        } else if (tailleTransacListCopy > transactionQueue.size()) {
-            tailleTransacListCopy = transactionQueue.size() + 1;
+        }
+        // On prévoit de la place pour la tx de récompense
+        if (reward > 0 && tailleTransacListCopy == 1) {
+            tailleTransacListCopy++;
         }
         String[] transacListCopy = new String[tailleTransacListCopy];
         if (reward > 0) {
