@@ -38,11 +38,9 @@ public class Main {
         CentralBank bcb = new CentralBank(filename);
         
         System.out.println("Nom Banque: " + bcb.getName());
-        User u = bcb.getUser("Creator");
-        int i = 1;
-        while (u != null) {
+        for (int i = 0; i < bcb.getUserCount(); ++i) {
+            User u = bcb.getUser(i);
             System.out.println(u.getName() + " possède " + u.getBalanceBnb() + " Bnb");
-            u = bcb.getUser("User" + i);
             ++i;
         }
     }

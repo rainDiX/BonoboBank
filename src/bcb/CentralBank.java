@@ -79,8 +79,8 @@ public class CentralBank implements Iterable<Transaction> {
         it.next();
         // premier bloc (indice 1)
         Transaction transacTemp = txtk.Parse(it.next().getTransactionListList()[0]);
-        // on récupère l'initial reward
-        this.reward = transacTemp.getMontant();
+        // on calcul le reward à partir de l'initial reward
+        this.reward = transacTemp.getMontant() / (long) Math.pow(2, 1 + (blockchain.getSize() / DECREASE_REWARD));
         this.name = transacTemp.getEmetteur();
         // on récupère Creator
         this.users.add(new User(transacTemp.getRecepteur(), this));
