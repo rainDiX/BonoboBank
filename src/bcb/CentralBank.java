@@ -1,6 +1,7 @@
 package bcb;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
@@ -72,24 +73,26 @@ public class CentralBank {
     public CentralBank(String filename) {
         logr.log(Level.INFO, "Tentative de lecture du fichier " + filename);
         this.blockchain = BCJsonUtils.BCJsonReader(filename);
+        Iterator<Block> it = blockchain.iterator();
+        // bloc 0 : genesis
+        it.next();
         // premier bloc (indice 1)
-        Transaction transacTemp = txtk.Parse(this.blockchain.getBlockAtIndex(1).getTransactionListList()[0]);
+        Transaction transacTemp = txtk.Parse(it.next().getTransactionListList()[0]);
         // on récupère l'initial reward
         this.reward = transacTemp.getMontant();
         this.name = transacTemp.getEmetteur();
-        /* ArrayList<String> UsersString=new ArrayList<String>(); */
 
-        for (int i = 2; i < this.blockchain.getSize(); i++) {
-            for (int j = 0; j < this.blockchain.getBlockAtIndex(i)
-                    .getTransactionCount(); j++) {/* on parcourt les blocks de la blockchain */
+        while (it.hasNext()){
+            Block block = it.next();
+            for (String txStr : block) {/* on parcourt les blocks de la blockchain */
                 /*
                  * on vérifie pour chaque transaction qui se trouve dans le bloc, si l'émetteur
                  * et le recepteur sont enregistrés dans la base de données
                  */
                 User userTemp1 = new User(
-                        txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getEmetteur(), this);
+                        txtk.Parse(txStr).getEmetteur(), this);
                 User userTemp2 = new User(
-                        txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getRecepteur(), this);
+                        txtk.Parse(txStr).getRecepteur(), this);
 
                 if (!this.users.contains(userTemp1) && !userTemp1.getName().equals(this.name)) {
                     this.users.add(userTemp1);
@@ -99,6 +102,7 @@ public class CentralBank {
                 }
             }
         }
+        logr.log(Level.INFO, "Import de la blockchain de " + filename + "  terminée");
     }
 
     /**
@@ -138,6 +142,14 @@ public class CentralBank {
     }
 
     /**
+     * 
+     * @return la blockchain
+     */
+    protected BlockChain getBlockchain() {
+        return this.blockchain;
+    }
+
+    /**
      * Ajoute un utilisateur
      * 
      * @return le nom de l'utilisateur ajouté
@@ -147,6 +159,22 @@ public class CentralBank {
         logr.fine("Ajout de l'utilisateur User" + index);
         users.add(new User("User" + index, this));
         return users.get(index).getName();
+    }
+    
+    /**
+     * 
+     * @param userName nom de l'utilisateur
+     * @return l'utilisateur ou null si il n'existe pas
+     */
+    public User getUser(String userName) {
+        Iterator<User> it = users.iterator();
+        while(it.hasNext()) {
+            User u = it.next();
+            if (u.getName() == userName) {
+                return u;
+            }
+        }
+        return null;
     }
 
     /**

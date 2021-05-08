@@ -1,11 +1,12 @@
 package blockChain;
 
 import java.util.ArrayList;
-
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.time.*;
 import miscUtils.HashUtil;
 
-public class Block {
+public class Block implements Iterable<String> {
     private int index;
     private int nonce;
     private String timestamp;
@@ -75,7 +76,7 @@ public class Block {
         // The number of level in a Merkel tree is the squareroot of
         // the number of transaction
         ArrayList<String> hashes = new ArrayList<String>();
-        if (transactionList.length == 0){
+        if (transactionList.length == 0) {
             throw new UnsupportedOperationException("Aucune transaction dans le block");
         }
         for (int i = 0; i < transactionList.length; ++i) {
@@ -98,6 +99,29 @@ public class Block {
 
     private String computeHash() {
         return HashUtil.applySha256(index + nonce + timestamp + merkelTreeRootHash + prevBlockHash);
+    }
+
+    @Override
+    public Iterator<String> iterator() {
+        return new Iterator<String>() {
+            private int cur = 0;
+
+            @Override
+            public boolean hasNext() {
+                return (cur < transactionList.length);
+            }
+
+            @Override
+            public String next() {
+                if (!hasNext())
+                    throw new NoSuchElementException();
+                return transactionList[cur++];
+            }
+            /*
+             * On ne va pas implémenter remove() L'implémentation par défaut throw une
+             * UnsupportedOperationException
+             */
+        };
     }
 
 }
