@@ -3,6 +3,7 @@ package bcb;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Random;
 import java.util.logging.*;
@@ -10,7 +11,7 @@ import java.util.logging.*;
 import blockChain.*;
 import miscUtils.BCJsonUtils;
 
-public class CentralBank {
+public class CentralBank implements Iterable<Transaction> {
     /**
      * nom de la banque
      */
@@ -82,17 +83,15 @@ public class CentralBank {
         this.reward = transacTemp.getMontant();
         this.name = transacTemp.getEmetteur();
 
-        while (it.hasNext()){
+        while (it.hasNext()) {
             Block block = it.next();
             for (String txStr : block) {/* on parcourt les blocks de la blockchain */
                 /*
                  * on vérifie pour chaque transaction qui se trouve dans le bloc, si l'émetteur
                  * et le recepteur sont enregistrés dans la base de données
                  */
-                User userTemp1 = new User(
-                        txtk.Parse(txStr).getEmetteur(), this);
-                User userTemp2 = new User(
-                        txtk.Parse(txStr).getRecepteur(), this);
+                User userTemp1 = new User(txtk.Parse(txStr).getEmetteur(), this);
+                User userTemp2 = new User(txtk.Parse(txStr).getRecepteur(), this);
 
                 if (!this.users.contains(userTemp1) && !userTemp1.getName().equals(this.name)) {
                     this.users.add(userTemp1);
@@ -101,6 +100,13 @@ public class CentralBank {
                     this.users.add(userTemp2);
                 }
             }
+        }
+
+        // on définit le loglevel de la console si besoin
+        if (Logger.getLogger("").getLevel() == Level.FINE) {
+            ConsoleHandler ch = new ConsoleHandler();
+            ch.setLevel(Level.FINE);
+            logr.addHandler(ch);
         }
         logr.log(Level.INFO, "Import de la blockchain de " + filename + "  terminée");
     }
@@ -142,14 +148,6 @@ public class CentralBank {
     }
 
     /**
-     * 
-     * @return la blockchain
-     */
-    protected BlockChain getBlockchain() {
-        return this.blockchain;
-    }
-
-    /**
      * Ajoute un utilisateur
      * 
      * @return le nom de l'utilisateur ajouté
@@ -160,7 +158,7 @@ public class CentralBank {
         users.add(new User("User" + index, this));
         return users.get(index).getName();
     }
-    
+
     /**
      * 
      * @param userName nom de l'utilisateur
@@ -168,12 +166,13 @@ public class CentralBank {
      */
     public User getUser(String userName) {
         Iterator<User> it = users.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             User u = it.next();
-            if (u.getName() == userName) {
+            if (u.getName().equals(userName)) {
                 return u;
             }
         }
+        logr.fine(userName + " non trouvé");
         return null;
     }
 
@@ -199,8 +198,8 @@ public class CentralBank {
         logr.info("# GENESIS #");
         Block blockGenesis = users.get(0).createGenesisBlock();
         blockchain.addBlock(blockGenesis);
+        // envoie de 50 Bnb à Creator
         transactionQueue.add(new Transaction(this.name, users.get(0).getName(), reward));
-        blockchain.addBlock(mineBlock());
     }
 
     /**
@@ -211,7 +210,8 @@ public class CentralBank {
         for (int i = 1; i < users.size(); ++i) {
             transactionQueue.add(new Transaction(this.name, users.get(i).getName(), reward));
         }
-        // Choix personnel : la récompense est 2fois moins importante que l'helicopter money
+        // Choix personnel : la récompense est 2fois moins importante que l'helicopter
+        // money
         reward = reward / 2;
         emptyTransactionQueue();
     }
@@ -263,8 +263,8 @@ public class CentralBank {
      */
 
     public Block mineBlock() {
-        if (blockchain.getSize() % DECREASE_REWARD == 0){
-            reward = reward/2;
+        if (blockchain.getSize() % DECREASE_REWARD == 0) {
+            reward = reward / 2;
         }
         int tailleTransacListCopy;
         if (reward > 0) {
@@ -320,5 +320,41 @@ public class CentralBank {
     public void writeJson(String filename) {
         logr.info("Écriture de la blockchain dans " + filename);
         BCJsonUtils.BCJsonWriter(this.blockchain, filename);
+    }
+
+    /**
+     * Iterateur permettant d'accéder directement à toutes les transaction
+     */
+    @Override
+    public Iterator<Transaction> iterator() {
+        return new Iterator<Transaction>() {
+            private Iterator<Block> blkIt = blockchain.iterator();
+            private Iterator<String> txIt = blkIt.next().iterator();
+
+            @Override
+            public boolean hasNext() {
+                return (txIt.hasNext() || blkIt.hasNext());
+            }
+
+            @Override
+            public Transaction next() {
+                if (!hasNext())
+                    throw new NoSuchElementException();
+                if (!txIt.hasNext()) {
+                    txIt = blkIt.next().iterator();
+                }
+                String txString = txIt.next();
+                // On passe le bloc génésis
+                if (txtk.isGenesis(txString)) {
+                    txIt = blkIt.next().iterator();
+                    txString = txIt.next();
+                }
+                return txtk.Parse(txString);
+            }
+            /*
+             * On ne va pas implémenter remove() L'implémentation par défaut throw une
+             * UnsupportedOperationException
+             */
+        };
     }
 }

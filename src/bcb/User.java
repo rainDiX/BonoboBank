@@ -10,7 +10,6 @@ import java.util.concurrent.ExecutorCompletionService;
 /* fin Import execution concurrente */
 
 import blockChain.Block;
-import blockChain.BlockChain;
 import miscUtils.HashUtil;
 
 public class User {
@@ -41,6 +40,13 @@ public class User {
      */
     public long getBalance() {
         long balance = 0;
+        for (Transaction tx : bank) {
+            if (tx.getEmetteur().equals(this.name)) {
+                balance -= tx.getMontant();
+            } else if (tx.getRecepteur().equals(this.name)) {
+                balance += tx.getMontant();
+            }
+        }
         return balance;
     }
 
@@ -150,17 +156,17 @@ class ComputeBlockHash implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-            String hash = HashUtil.applySha256(
-                    b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
-            while (!hash.startsWith("0".repeat(difficulty))) {
-                // On arrête tout si le thread est interrompu
-                if (Thread.currentThread().isInterrupted()) {
-                    throw new InterruptedException(); 
-                }
-                nonce += offset;
-                hash = HashUtil.applySha256(
-                        b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
+        String hash = HashUtil.applySha256(
+                b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
+        while (!hash.startsWith("0".repeat(difficulty))) {
+            // On arrête tout si le thread est interrompu
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
             }
-            return nonce;
+            nonce += offset;
+            hash = HashUtil.applySha256(
+                    b.getIndex() + nonce + b.getTimestamp() + b.getMerkelTreeRootHash() + b.getPrevBlockHash());
+        }
+        return nonce;
     }
 }

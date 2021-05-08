@@ -46,7 +46,7 @@ public class TransactionToolkit {
 	}
 
 	public boolean isGenesis(String s) {
-		return s == "Genesis";
+		return s.equals("Genesis");
 	}
 
 	/**

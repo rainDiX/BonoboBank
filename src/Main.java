@@ -2,6 +2,7 @@
 import java.util.logging.*;
 
 import bcb.CentralBank;
+import bcb.User;
 
 public class Main {
 
@@ -36,7 +37,14 @@ public class Main {
     public static void openBCB(String filename) {
         CentralBank bcb = new CentralBank(filename);
         
-        System.out.println(bcb.getName());
+        System.out.println("Nom Banque: " + bcb.getName());
+        User u = bcb.getUser("Creator");
+        int i = 1;
+        while (u != null) {
+            System.out.println(u.getName() + " possède " + u.getBalanceBnb() + " Bnb");
+            u = bcb.getUser("User" + i);
+            ++i;
+        }
     }
 
     public static void printUsage() {
