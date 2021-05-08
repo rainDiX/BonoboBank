@@ -20,7 +20,7 @@ public class CentralBank implements Iterable<Transaction> {
     /**
      * Nombre maximum de transaction par block
      */
-    private final int MAX_TRANSAC_PER_BLOC = 10;
+    private static final int MAX_TRANSAC_PER_BLOC = 10;
 
     /**
      * Utilisateur/mineurs de la blockchain
@@ -323,7 +323,7 @@ public class CentralBank implements Iterable<Transaction> {
     }
 
     /**
-     * Iterateur permettant d'accéder directement à toutes les transaction
+     * Iterateur permettant d'accéder directement à toutes les transactions
      */
     @Override
     public Iterator<Transaction> iterator() {
