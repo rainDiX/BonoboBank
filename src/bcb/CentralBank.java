@@ -49,9 +49,14 @@ public class CentralBank {
     private Random rng = new Random();
 
     /**
-     * Récompense attribué lors de l'hélicopter maney
+     * Récompense attribué lors de l'hélicopter maney, puis au minage
      */
-    private final long initialReward;
+    private long reward;
+
+    /**
+     * On divise par 2 la récompense tout les DECREASE_REWARD blocs
+     */
+    private static final int DECREASE_REWARD = 10;
 
     /**
      * logger pour gérer les messages
@@ -70,10 +75,10 @@ public class CentralBank {
         // premier bloc (indice 1)
         Transaction transacTemp = txtk.Parse(this.blockchain.getBlockAtIndex(1).getTransactionListList()[0]);
         // on récupère l'initial reward
-        this.initialReward = transacTemp.getMontant();
-        this.name=transacTemp.getEmetteur();
-        /* ArrayList<String> UsersString=new ArrayList<String>();*/
-        
+        this.reward = transacTemp.getMontant();
+        this.name = transacTemp.getEmetteur();
+        /* ArrayList<String> UsersString=new ArrayList<String>(); */
+
         for (int i = 2; i < this.blockchain.getSize(); i++) {
             for (int j = 0; j < this.blockchain.getBlockAtIndex(i)
                     .getTransactionCount(); j++) {/* on parcourt les blocks de la blockchain */
@@ -81,15 +86,16 @@ public class CentralBank {
                  * on vérifie pour chaque transaction qui se trouve dans le bloc, si l'émetteur
                  * et le recepteur sont enregistrés dans la base de données
                  */
-                User userTemp1 = new User (txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getEmetteur());
-                User userTemp2 = 
-                        new User (txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getRecepteur());
-                
+                User userTemp1 = new User(
+                        txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getEmetteur());
+                User userTemp2 = new User(
+                        txtk.Parse(this.blockchain.getBlockAtIndex(i).getTransactionListList()[j]).getRecepteur());
+
                 if (!this.users.contains(userTemp1) && !userTemp1.getName().equals(this.name)) {
-                	this.users.add(userTemp1);
+                    this.users.add(userTemp1);
                 }
                 if (!this.users.contains(userTemp2) && !userTemp2.getName().equals(this.name)) {
-                	this.users.add(userTemp2);
+                    this.users.add(userTemp2);
                 }
             }
         }
@@ -98,14 +104,14 @@ public class CentralBank {
     /**
      * 
      * @param name                 Nom de la banque
-     * @param initialReward        récompense de l'helicapter money
+     * @param initialReward        récompense initiale de minage
      * @param blockchainDifficulty difficulté de minage
      */
     public CentralBank(String name, long initialReward, int blockchainDifficulty) {
         this.name = name;
-        
+
         users.add(new User("Creator"));
-        this.initialReward = initialReward;
+        this.reward = initialReward;
         blockchain = new BlockChain(blockchainDifficulty);
 
         // on définit le loglevel de la console si besoin
@@ -134,13 +140,13 @@ public class CentralBank {
     /**
      * Ajoute un utilisateur
      * 
-     * @return l'index de l'utilisateur ajouté
+     * @return le nom de l'utilisateur ajouté
      */
-    public int addUser() {
+    public String addUser() {
         int index = users.size();
         logr.fine("Ajout de l'utilisateur User" + index);
         users.add(new User("User" + index));
-        return index;
+        return users.get(index).getName();
     }
 
     /**
@@ -165,8 +171,8 @@ public class CentralBank {
         logr.info("# GENESIS #");
         Block blockGenesis = users.get(0).createGenesisBlock();
         blockchain.addBlock(blockGenesis);
-        transactionQueue.add(new Transaction(this.name, users.get(0).getName(), initialReward));
-        blockchain.addBlock(asktoMine());
+        transactionQueue.add(new Transaction(this.name, users.get(0).getName(), reward));
+        blockchain.addBlock(mineBlock());
     }
 
     /**
@@ -175,8 +181,10 @@ public class CentralBank {
     public void helicopterMoney() {
         logr.info("# HELICOPTER MONEY #");
         for (int i = 1; i < users.size(); ++i) {
-            transactionQueue.add(new Transaction(this.name, users.get(i).getName(), initialReward));
+            transactionQueue.add(new Transaction(this.name, users.get(i).getName(), reward));
         }
+        // Choix personnel : la récompense est 2fois moins importante que l'helicopter money
+        reward = reward / 2;
         emptyTransactionQueue();
     }
 
@@ -190,7 +198,7 @@ public class CentralBank {
              * peut donner la taille qu'on veut à la liste de transaction qui va se trouver
              * dans chaque bloc
              */
-            Block b = asktoMine();
+            Block b = mineBlock();
             blockchain.addBlock(b);
         }
     }
@@ -215,9 +223,47 @@ public class CentralBank {
             /*
              * une fois des transactions ajoutées on mine un bloc
              */
-            Block b = asktoMine();
+            Block b = mineBlock();
             blockchain.addBlock(b);
         }
+    }
+
+    /**
+     * Créer une la liste de transaction à miner et appèle askMinerToMine
+     * 
+     * @return Block Miné
+     */
+
+    public Block mineBlock() {
+        if (blockchain.getSize() % DECREASE_REWARD == 0){
+            reward = reward/2;
+        }
+        int tailleTransacListCopy;
+        if (reward > 0) {
+            // On garde une transaction de libre pour la récompense
+            // pas de frais pour les tx en V1
+            tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC - 1) + 1;
+        } else {
+            tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
+        }
+
+        if (tailleTransacListCopy > transactionQueue.size() && reward == 0) {
+            // Si il reste moins d'élément dans la queue on injecte ce qu'il reste
+            tailleTransacListCopy = transactionQueue.size();
+        } else if (tailleTransacListCopy > transactionQueue.size()) {
+            tailleTransacListCopy = transactionQueue.size() + 1;
+        }
+        String[] transacListCopy = new String[tailleTransacListCopy];
+        if (reward > 0) {
+            tailleTransacListCopy -= 1;
+        }
+        for (int i = 0; i < tailleTransacListCopy; i++) {
+            // on copie une partie de la grande liste de transaction dans la plus petite
+            // pour pouvoir l'injecter dans le bloc
+            transacListCopy[i] = transactionQueue.remove().toString();
+        }
+        Block mined = askMinerToMine(transacListCopy);
+        return mined;
     }
 
     /**
@@ -225,22 +271,13 @@ public class CentralBank {
      * 
      * @return un block miné
      */
-    public Block asktoMine() {
+    public Block askMinerToMine(String[] transacList) {
         User miner = users.get(rng.nextInt(users.size()));
         logr.fine("Demande de minage à " + miner.getName());
-
-        int tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
-        if (tailleTransacListCopy > transactionQueue.size()) {
-            // Si il reste moins d'élément dans la queue on injecte ce qu'il reste
-            tailleTransacListCopy = transactionQueue.size();
+        if (reward > 0) {
+            transacList[transacList.length - 1] = new Transaction("coinbase", miner.getName(), reward).toString();
         }
-        String[] transacListCopy = new String[tailleTransacListCopy];
-        for (int i = 0; i < tailleTransacListCopy; i++) {
-            // on copie une partie de la grande liste de transaction dans la plus petite
-            // pour pouvoir l'injecter dans le bloc
-            transacListCopy[i] = transactionQueue.remove().toString();
-        }
-        Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), transacListCopy);
+        Block toMine = new Block(blockchain.getSize(), blockchain.getLastBlock().getHash(), transacList);
         miner.Mine2(blockchain.getDifficulty(), toMine);
         logr.info("Block Miné !! : Block n°" + toMine.getIndex() + " Hash: " + toMine.getHash() + " Nonce: "
                 + toMine.getNonce());

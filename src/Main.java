@@ -15,12 +15,14 @@ public class Main {
         logr.info("Récompense de l'helicopter money: " + initialReward / 100000000l + " Bnb");
 
         CentralBank coinbase = new CentralBank("coinbase", initialReward, difficulty);
-        // Genesis
-        coinbase.genesis();
         // Ajout de N utilisateurs
         for (int i = 1; i <= userCount; ++i) {
             coinbase.addUser();
         }
+        
+        // Genesis
+        coinbase.genesis();
+        
         // Helicopter Money
         coinbase.helicopterMoney();
         // Phase de marché :
