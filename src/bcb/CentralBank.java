@@ -152,12 +152,14 @@ public class CentralBank implements Iterable<Transaction> {
     /**
      * Ajoute un utilisateur
      * 
-     * @return le nom de l'utilisateur ajouté
+     * @param name nom donné à l'utilisateur
+     * @return l'utilisateur ajouté
      */
-    public String addUser() {
+    public String addUser(String name) {
         int index = users.size();
-        logr.fine("Ajout de l'utilisateur User" + index);
-        users.add(new User("User" + index, this));
+        String append = "@" + Integer.toHexString(index);
+        logr.fine("Ajout de l'utilisateur " + name + append);
+        users.add(new User(name + append, this));
         return users.get(index).getName();
     }
 

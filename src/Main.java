@@ -18,7 +18,7 @@ public class Main {
         CentralBank coinbase = new CentralBank("coinbase", initialReward, difficulty);
         // Ajout de N utilisateurs
         for (int i = 1; i <= userCount; ++i) {
-            coinbase.addUser();
+            coinbase.addUser("User");
         }
         
         // Genesis
