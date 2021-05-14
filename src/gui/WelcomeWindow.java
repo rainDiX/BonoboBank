@@ -11,6 +11,8 @@ import javax.swing.SpringLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.ImageIcon;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class WelcomeWindow {
 
@@ -58,6 +60,13 @@ public class WelcomeWindow {
 		frmBonoboBank.getContentPane().add(btnOpenButton);
 		
 		JButton btnNewButton_1 = new JButton("Nouvelle blockchain");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CreationWizard cw = new CreationWizard();
+				cw.setVisible(true);
+				frmBonoboBank.dispose();
+			}
+		});
 		springLayout.putConstraint(SpringLayout.SOUTH, btnNewButton_1, 0, SpringLayout.SOUTH, btnOpenButton);
 		springLayout.putConstraint(SpringLayout.EAST, btnNewButton_1, -10, SpringLayout.EAST, frmBonoboBank.getContentPane());
 		frmBonoboBank.getContentPane().add(btnNewButton_1);

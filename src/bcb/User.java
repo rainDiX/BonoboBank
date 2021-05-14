@@ -93,6 +93,11 @@ public class User {
         return user.getName().equals(this.name);
     }
 
+    @Override
+    public String toString(){
+        return this.name;
+    }
+
     /**
      * Mine le block
      * 
