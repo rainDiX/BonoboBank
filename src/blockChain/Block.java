@@ -6,6 +6,17 @@ import java.util.NoSuchElementException;
 import java.time.*;
 import miscUtils.HashUtil;
 
+/**
+ * Block : la structure d'un bloc
+ * 
+ * <p>
+ * Implémente l'interface Iterable permettant d'accéder
+ * facilement à toutes les transactions comprise dans le bloc
+ * <p>
+ * 
+ * @author Dijoux Romain
+ * @author Guichard Lucas
+ */
 public class Block implements Iterable<String> {
     private int index;
     private int nonce;
@@ -23,6 +34,13 @@ public class Block implements Iterable<String> {
         return nonce;
     }
 
+    /**
+     * Set la nonce d'un bloc
+     * <p>
+     * ATTENTION, recalcule le hash du bloc quand appelé
+     * </p>
+     * @param nonce
+     */
     public void setNonce(int nonce) {
         this.nonce = nonce;
         this.hash = computeHash();
@@ -48,7 +66,7 @@ public class Block implements Iterable<String> {
         return prevBlockHash;
     }
 
-    public String[] getTransactionListList() {
+    public String[] getTransactionList() {
         return transactionList;
     }
 
@@ -72,6 +90,20 @@ public class Block implements Iterable<String> {
         this.hash = computeHash();
     }
 
+    /**
+     * Constructeur du block genesis
+     */
+    public Block() {
+        this.index = 0;
+        nonce = 0;
+        this.prevBlockHash = "0";
+        String[] tx = { "Genesis" };
+        this.transactionList = tx;
+        this.timestamp = LocalDateTime.now().toString();
+        merkelTreeRootHash = ComputeMerkelTreeRootHash();
+        this.hash = computeHash();
+    }
+
     private String ComputeMerkelTreeRootHash() throws UnsupportedOperationException {
         // The number of level in a Merkel tree is the squareroot of
         // the number of transaction
@@ -79,8 +111,8 @@ public class Block implements Iterable<String> {
         if (transactionList.length == 0) {
             throw new UnsupportedOperationException("Aucune transaction dans le block");
         }
-        for (int i = 0; i < transactionList.length; ++i) {
-            hashes.add(HashUtil.applySha256(transactionList[i]));
+        for (String transac : this) {
+            hashes.add(HashUtil.applySha256(transac));
         }
         while (hashes.size() != 1) {
             if ((hashes.size() % 2) != 0) {
@@ -101,6 +133,9 @@ public class Block implements Iterable<String> {
         return HashUtil.applySha256(index + nonce + timestamp + merkelTreeRootHash + prevBlockHash);
     }
 
+    /**
+     * Implémenation de l'itérateur
+     */
     @Override
     public Iterator<String> iterator() {
         return new Iterator<String>() {

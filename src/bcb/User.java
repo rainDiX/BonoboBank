@@ -12,6 +12,17 @@ import java.util.concurrent.ExecutorCompletionService;
 import blockChain.Block;
 import miscUtils.HashUtil;
 
+/**
+ * User : classe représentant un utilisateur/mineur de la blockchain
+ *
+ * <p>
+ * Il est affilié à une banque, et à partir des transaction présentes
+ * dans la blockchain, on peut avoir le solde de son compte
+ * </p>
+ * @author Dijoux Romain
+ * 
+ */
+
 public class User {
 
     /**
@@ -58,8 +69,7 @@ public class User {
     }
 
     protected Block createGenesisBlock() {
-        String[] tx = { "Genesis" };
-        Block genesis = new Block(0, "0", tx);
+        Block genesis = new Block();
         return genesis;
     }
 
