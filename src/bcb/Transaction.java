@@ -5,6 +5,16 @@ import java.util.Random;
 
 import miscUtils.HashUtil;
 
+/**
+* Transaction v1
+* <p>
+* Transaction est une représentation haut-niveau des transaction
+* stockées dans les blocs.
+* </p>
+* @author Dijoux Romain
+* @author Guichard Lucas
+* 
+*/
 public class Transaction {
 
 	/**

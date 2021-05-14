@@ -11,6 +11,24 @@ import java.util.logging.*;
 import blockChain.*;
 import miscUtils.BCJsonUtils;
 
+/**
+* CentralBank regroupe toutes les fonctions monétaires
+* <p>
+* C'est elle qui gère :
+* - la phase d'helicopter money
+* - la distribution des récompense de minage
+* - la phase de marché
+* C'est ici que réside la file de transaction à traiter.
+* Elle garde aussi une liste des utilisateurs/mineurs.
+* Elle implémente l'interface Iterable permettant d'accéder
+* facilement à toutes les transactions comprises dans les
+* blocs de la blockchain.
+* </p>
+* @author Dijoux Romain
+* @author Guichard Lucas
+* 
+*/
+
 public class CentralBank implements Iterable<Transaction> {
     /**
      * nom de la banque
@@ -23,7 +41,7 @@ public class CentralBank implements Iterable<Transaction> {
     private static final int MAX_TRANSAC_PER_BLOC = 10;
 
     /**
-     * Utilisateur/mineurs de la blockchain
+     * Utilisateurs/mineurs de la blockchain
      */
     private ArrayList<User> users = new ArrayList<User>();
 
@@ -78,7 +96,7 @@ public class CentralBank implements Iterable<Transaction> {
         // bloc 0 : genesis
         it.next();
         // premier bloc (indice 1)
-        Transaction transacTemp = txtk.Parse(it.next().getTransactionListList()[0]);
+        Transaction transacTemp = txtk.Parse(it.next().getTransactionList()[0]);
         // on calcul le reward à partir de l'initial reward
         this.reward = transacTemp.getMontant() / (long) Math.pow(2, 1 + (blockchain.getSize() / DECREASE_REWARD));
         this.name = transacTemp.getEmetteur();

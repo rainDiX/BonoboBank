@@ -6,6 +6,13 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.logging.*;
 
+/**
+ * TransactionToolkit : Fonctions utiles pour manipuler des transactions
+ *
+ * @author Dijoux Romain
+ * @author Guichard Lucas
+ * 
+ */
 public class TransactionToolkit {
 
 	Random rng = new Random();
