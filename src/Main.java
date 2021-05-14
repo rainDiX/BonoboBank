@@ -20,10 +20,10 @@ public class Main {
         for (int i = 1; i <= userCount; ++i) {
             coinbase.addUser("User");
         }
-        
+
         // Genesis
         coinbase.genesis();
-        
+
         // Helicopter Money
         coinbase.helicopterMoney();
         // Phase de marché :
@@ -34,14 +34,22 @@ public class Main {
         }
     }
 
-    public static void openBCB(String filename) {
+    public static CentralBank openBCB(String filename) {
         CentralBank bcb = new CentralBank(filename);
-        
+
         System.out.println("Nom Banque: " + bcb.getName());
         for (int i = 0; i < bcb.getUserCount(); ++i) {
             User u = bcb.getUser(i);
             System.out.println(u.getName() + " possède " + u.getBalanceBnb() + " Bnb");
             ++i;
+        }
+        return bcb;
+    }
+
+    public static void ContinueBCB(CentralBank bcb, int blockCount, boolean saving, String filename) {
+        bcb.mercatoPhase(blockCount);
+        if (saving) {
+            bcb.writeJson(filename);
         }
     }
 
@@ -53,14 +61,17 @@ public class Main {
         System.out.println("-u nb : nombre d'utilisateur (10 par défaut)");
         System.out.println("-f fichier.json : fichier contenant une blockchain");
         System.out.println("-s fichier.json : fichier où sauvegarder la blockchain à la fin");
+        System.out.println("-v affichage plus détaillé");
+        System.out.println("-vv affichage encore plus détaillé utile pour débugger");
     }
 
     public static void main(String[] args) throws Exception {
         boolean opening = false;
         boolean saving = false;
         boolean helpflag = false;
-        String filename = "";
-        int blockCount = 100;
+        String savingPath = "";
+        String openingPath = "";
+        int blockCount = -1;
         int difficulty = 4;
         // 50 Bnb
         long initialReward = 5000000000l;
@@ -130,7 +141,7 @@ public class Main {
                         printUsage();
                         throw new Exception("Argument manquant");
                     }
-                    filename = args[i + 1];
+                    savingPath = args[i + 1];
                     saving = true;
                     ++i;
                     break;
@@ -139,7 +150,7 @@ public class Main {
                         printUsage();
                         throw new Exception("Argument manquant");
                     }
-                    filename = args[i + 1];
+                    openingPath = args[i + 1];
                     opening = true;
                 case "-v":
                     rootLogr.setLevel(Level.INFO);
@@ -149,12 +160,15 @@ public class Main {
                     break;
             }
         }
-        if (helpflag || (opening && saving)) {
+        if (helpflag || (!opening && blockCount == -1)) {
             printUsage();
         } else if (opening) {
-            openBCB(filename);
+            CentralBank bcb = openBCB(openingPath);
+            if (blockCount > 0) {
+                ContinueBCB(bcb, blockCount, saving, savingPath);
+            }
         } else {
-            launchBCB(difficulty, userCount, blockCount, initialReward, saving, filename);
+            launchBCB(difficulty, userCount, blockCount, initialReward, saving, savingPath);
         }
     }
 }
