@@ -108,7 +108,7 @@ public class CreationWizard extends JFrame {
 		        bcb.mercatoPhase((Integer)blockSpinner.getValue());
 		        
 		        // Visualisation de la blockchain cree
-		        DataVisual visu = new DataVisual(bcb);
+		        MainWindow visu = new MainWindow(bcb);
 				visu.setVisible(true);
 			}
 		});

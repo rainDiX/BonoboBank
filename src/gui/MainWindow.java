@@ -23,7 +23,7 @@ import java.awt.FlowLayout;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
-public class DataVisual extends JFrame {
+public class MainWindow extends JFrame {
 
 	private JPanel contentPane;
 	
@@ -32,7 +32,7 @@ public class DataVisual extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public DataVisual(CentralBank bank) {
+	public MainWindow(CentralBank bank) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 700, 460);
 		contentPane = new JPanel();
