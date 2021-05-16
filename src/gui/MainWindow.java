@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import java.awt.CardLayout;
+
 import javax.swing.JTabbedPane;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
@@ -31,6 +32,11 @@ import java.awt.event.ComponentListener;
 import java.io.File;
 import java.awt.event.ActionEvent;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.SpringLayout;
+import javax.swing.JButton;
+import javax.swing.JSpinner;
 
 public class MainWindow extends JFrame {
 
@@ -45,6 +51,12 @@ public class MainWindow extends JFrame {
 	private JMenuItem mntmMineMore;
 	
 	private JMenuItem mntmAddUser;
+	
+	private JButton btnGoto;
+	
+	private JSpinner spinnerBlock;
+	
+	private JLabel lblInfos;
 
 	private CentralBank bank;
 
@@ -83,9 +95,7 @@ public class MainWindow extends JFrame {
 			public void componentHidden(ComponentEvent e) {
 				bank = cw.getBank();
 				if (bank != null) {
-					updateUsers();
-					updateTransactions();
-					enableButtons();
+					updateGUIElements();
 					bcv.loadNewBlockChain(bank.getBlockChain());
 				}
 			}
@@ -103,11 +113,9 @@ public class MainWindow extends JFrame {
 		mntmOuvrir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String path = showOpenFileDialog();
-				if (path != null) {
+				if (path != "") {
 					bank = new CentralBank(path);
-					updateUsers();
-					updateTransactions();
-					enableButtons();
+					updateGUIElements();
 					bcv.loadNewBlockChain(bank.getBlockChain());
 				}
 			}
@@ -115,6 +123,14 @@ public class MainWindow extends JFrame {
 		mnFichier.add(mntmOuvrir);
 
 		mntmSave = new JMenuItem("Enregistrer");
+		mntmSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String path = showSaveFileDialog();
+				if (path != "") {
+					bank.writeJson(path);
+				}
+			}
+		});
 		mntmSave.setEnabled(false);
 		mnFichier.add(mntmSave);
 
@@ -122,17 +138,42 @@ public class MainWindow extends JFrame {
 		menuBar.add(mnGestion);
 
 		mntmAddUser = new JMenuItem("Ajouter un utilisateur");
+		mntmAddUser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String username = JOptionPane.showInputDialog("Nom de l'utilisateur");
+				if (username != null) {
+					bank.addUser(username);
+					JOptionPane.showMessageDialog(null, "Des blocs devront être minés pour valider l'ajout");
+				}
+			}
+		});
 		mntmAddUser.setEnabled(false);
 		mnGestion.add(mntmAddUser);
 
 		mntmMineMore = new JMenuItem("Miner plus de blocs");
+		mntmMineMore.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String blockCountStr = JOptionPane.showInputDialog("Entrez le nombre à miner");
+				while (blockCountStr != null && !blockCountStr.matches("[0-9]+")) {
+					JOptionPane.showMessageDialog(null, "Entrez un entier positif", "Erreur", JOptionPane.ERROR_MESSAGE);
+					blockCountStr = JOptionPane.showInputDialog("Entrez le nombre à miner");
+				}
+				if (blockCountStr != null) {
+					int blockCount = Integer.valueOf(blockCountStr);
+					if (blockCount > 0) {
+						bank.mercatoPhase(blockCount);
+						updateGUIElements();
+					}
+				}
+			}
+		});
 		mntmMineMore.setEnabled(false);
 		mnGestion.add(mntmMineMore);
 		
 		JMenu mnTools = new JMenu("Outils");
 		menuBar.add(mnTools);
 		
-		mntmCheck = new JMenuItem("Vérifier la validitée");
+		mntmCheck = new JMenuItem("Vérifier la validité");
 		mntmCheck.setEnabled(false);
 		mntmCheck.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -151,10 +192,63 @@ public class MainWindow extends JFrame {
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane, "name_22859933822224");
-
+		
 		bcv = new BlockChainView(null);
-		JScrollPane scrollableListBlockChainView = new JScrollPane(bcv);
-		tabbedPane.addTab("BlockChain", null, bcv, null);
+		
+		JScrollPane scrollableBlockChainView = new JScrollPane(bcv);
+		JPanel blockchainTab = new JPanel();
+		SpringLayout sl_blockchainTab = new SpringLayout();
+		sl_blockchainTab.putConstraint(SpringLayout.NORTH, scrollableBlockChainView, 5, SpringLayout.NORTH, blockchainTab);
+		sl_blockchainTab.putConstraint(SpringLayout.WEST, scrollableBlockChainView, 10, SpringLayout.WEST, blockchainTab);
+		blockchainTab.setLayout(sl_blockchainTab);
+		blockchainTab.add(scrollableBlockChainView);
+
+		bcv.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				bcv.clickBlock(e.getX(), e.getY());
+			}
+		});
+		
+		tabbedPane.addTab("BlockChain", null, blockchainTab, null);
+		
+		btnGoto = new JButton("Goto");
+		sl_blockchainTab.putConstraint(SpringLayout.SOUTH, scrollableBlockChainView, -6, SpringLayout.NORTH, btnGoto);
+		sl_blockchainTab.putConstraint(SpringLayout.EAST, scrollableBlockChainView, 0, SpringLayout.EAST, btnGoto);
+		btnGoto.setEnabled(false);
+		btnGoto.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = (int) spinnerBlock.getValue();
+				if (index < 0 || index >= bank.getBlockChain().getSize()) {
+					JOptionPane.showMessageDialog(null, "Index pas dans la blockchain", "Test de validité", JOptionPane.ERROR_MESSAGE);
+				} else {
+					BlockView bv = new BlockView(bank.getBlockChain().getBlockAtIndex(index));
+					bv.setVisible(true);
+				}
+			}
+		});
+		
+		sl_blockchainTab.putConstraint(SpringLayout.SOUTH, btnGoto, -10, SpringLayout.SOUTH, blockchainTab);
+		sl_blockchainTab.putConstraint(SpringLayout.EAST, btnGoto, -10, SpringLayout.EAST, blockchainTab);
+		blockchainTab.add(btnGoto);
+		
+		spinnerBlock = new JSpinner();
+		sl_blockchainTab.putConstraint(SpringLayout.NORTH, spinnerBlock, -30, SpringLayout.SOUTH, blockchainTab);
+		sl_blockchainTab.putConstraint(SpringLayout.WEST, spinnerBlock, -98, SpringLayout.WEST, btnGoto);
+		sl_blockchainTab.putConstraint(SpringLayout.SOUTH, spinnerBlock, -10, SpringLayout.SOUTH, blockchainTab);
+		sl_blockchainTab.putConstraint(SpringLayout.EAST, spinnerBlock, -6, SpringLayout.WEST, btnGoto);
+		blockchainTab.add(spinnerBlock);
+		
+		lblInfos = new JLabel("infos");
+		sl_blockchainTab.putConstraint(SpringLayout.WEST, lblInfos, 10, SpringLayout.WEST, blockchainTab);
+		sl_blockchainTab.putConstraint(SpringLayout.SOUTH, lblInfos, 0, SpringLayout.SOUTH, btnGoto);
+		blockchainTab.add(lblInfos);
+		
+		JLabel lblBlock = new JLabel("Block");
+		sl_blockchainTab.putConstraint(SpringLayout.SOUTH, lblBlock, 0, SpringLayout.SOUTH, btnGoto);
+		sl_blockchainTab.putConstraint(SpringLayout.EAST, lblBlock, -6, SpringLayout.WEST, spinnerBlock);
+		blockchainTab.add(lblBlock);
+		
 
 		JPanel usersView = new JPanel();
 		tabbedPane.addTab("Utilisateurs", null, usersView, null);
@@ -208,31 +302,31 @@ public class MainWindow extends JFrame {
 		
 	}
 
-	private void updateUsers() {
+	private void updateGUIElements() {
 		accounts = new long[bank.getUserCount()];
 		lusers.removeAllElements();
 		for (int i = 0; i < bank.getUserCount(); ++i) {
 			lusers.addElement(bank.getUser(i));
 			accounts[i] = lusers.get(i).getBalanceBnb();
 		}
-	}
-	
-	private void updateTransactions() {
 		ltx.removeAllElements();
 		for (Transaction tx : bank) {
 			ltx.addElement(tx);
 		}
-	}
-	
-	private void enableButtons() {
+		lblInfos.setText("Banque: " + bank.getName() + " | difficulté: " 
+				+ bank.getBlockChain().getDifficulty()
+				+ " | taille: " + this.bank.getBlockChain().getSize());
 		mntmSave.setEnabled(true);
 		mntmCheck.setEnabled(true);
 		mntmAddUser.setEnabled(true);
 		mntmMineMore.setEnabled(true);
+		btnGoto.setEnabled(true);
 	}
+	
 	
 	private String showOpenFileDialog() {
         JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Ouvrir");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
@@ -242,6 +336,27 @@ public class MainWindow extends JFrame {
         fileChooser.setAcceptAllFileFilterUsed(true);
  
         int result = fileChooser.showOpenDialog(this);
+ 
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            return selectedFile.getAbsolutePath();
+        }
+        return "";
+    }
+	
+	private String showSaveFileDialog() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+		fileChooser.setDialogTitle("Sauvegarder");
+        
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Blockchain JSON", "json"));
+ 
+        fileChooser.setAcceptAllFileFilterUsed(true);
+ 
+        int result = fileChooser.showSaveDialog(this);
  
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();

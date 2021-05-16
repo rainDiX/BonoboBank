@@ -8,7 +8,8 @@ import java.util.NoSuchElementException;
  * Blockchain regroupe la liste de block et les fonctions associées
  *
  * <p>
- * La blockChain est une liste chainée de block associé à une difficulté de minage.
+ * La blockChain est une liste chainée de block associé à une difficulté de minage
+ * et un nombre maximum de transaction par bloc.
  * Elle implémente l'interface Iterable qui permet de faire des foreach et ainsi
  * à parcourir linéairement les blocs de la blockchain.
  * </p>
