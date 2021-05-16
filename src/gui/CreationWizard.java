@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 
 import java.awt.event.ActionListener;
-import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 

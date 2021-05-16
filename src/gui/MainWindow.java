@@ -1,7 +1,5 @@
 package gui;
 
-import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -9,8 +7,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.CardLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 
@@ -20,11 +16,7 @@ import bcb.User;
 import blockChain.BlockChainCheck;
 
 import javax.swing.JLabel;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.ScrollPane;
 import javax.swing.BoxLayout;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -36,10 +28,6 @@ import javax.swing.JMenu;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.awt.event.ActionEvent;
 import java.awt.Toolkit;
@@ -47,6 +35,8 @@ import java.awt.Toolkit;
 public class MainWindow extends JFrame {
 
 	private JPanel contentPane;
+	
+	private BlockChainView bcv;
 	
 	private JMenuItem mntmCheck;
 	
@@ -96,6 +86,7 @@ public class MainWindow extends JFrame {
 					updateUsers();
 					updateTransactions();
 					enableButtons();
+					bcv.loadNewBlockChain(bank.getBlockChain());
 				}
 			}
 		});
@@ -117,6 +108,7 @@ public class MainWindow extends JFrame {
 					updateUsers();
 					updateTransactions();
 					enableButtons();
+					bcv.loadNewBlockChain(bank.getBlockChain());
 				}
 			}
 		});
@@ -160,8 +152,9 @@ public class MainWindow extends JFrame {
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		contentPane.add(tabbedPane, "name_22859933822224");
 
-		JPanel blockchainView = new JPanel();
-		tabbedPane.addTab("BlockChain", null, blockchainView, null);
+		bcv = new BlockChainView(null);
+		JScrollPane scrollableListBlockChainView = new JScrollPane(bcv);
+		tabbedPane.addTab("BlockChain", null, bcv, null);
 
 		JPanel usersView = new JPanel();
 		tabbedPane.addTab("Utilisateurs", null, usersView, null);
