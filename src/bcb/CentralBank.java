@@ -36,11 +36,6 @@ public class CentralBank implements Iterable<Transaction> {
     public String name;
 
     /**
-     * Nombre maximum de transaction par block
-     */
-    private static final int MAX_TRANSAC_PER_BLOC = 10;
-
-    /**
      * Utilisateurs/mineurs de la blockchain
      */
     private ArrayList<User> users = new ArrayList<User>();
@@ -137,12 +132,12 @@ public class CentralBank implements Iterable<Transaction> {
      * @param initialReward        récompense initiale de minage
      * @param blockchainDifficulty difficulté de minage
      */
-    public CentralBank(String name, long initialReward, int blockchainDifficulty) {
+    public CentralBank(String name, long initialReward, int blockchainDifficulty, int transacLimit) {
         this.name = name;
 
         users.add(new User("Creator", this));
         this.reward = initialReward;
-        blockchain = new BlockChain(blockchainDifficulty);
+        blockchain = new BlockChain(blockchainDifficulty, transacLimit);
 
         // on définit le loglevel de la console si besoin
         if (Logger.getLogger("").getLevel() == Level.FINE) {
@@ -273,7 +268,7 @@ public class CentralBank implements Iterable<Transaction> {
              * maintenant on fait des transactions aléatoires qu'on injecte dans des
              * nouveaux blocs
              */
-            int nombreTransac = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
+            int nombreTransac = rng.nextInt(this.getBlockChain().getTransacLimit()) + 1;
             /* pour cela on va utiliser la queue de transactions */
             for (int j = 0; j < nombreTransac; j++) {
                 transactionQueue.add(txtk.Generate(this.users));
@@ -296,7 +291,7 @@ public class CentralBank implements Iterable<Transaction> {
         if (blockchain.getSize() % DECREASE_REWARD == 0) {
             reward = reward / 2;
         }
-        int tailleTransacListCopy = rng.nextInt(MAX_TRANSAC_PER_BLOC) + 1;
+        int tailleTransacListCopy = rng.nextInt(this.getBlockChain().getTransacLimit()) + 1;
 
         if (tailleTransacListCopy > transactionQueue.size()) {
             // Si il reste moins d'élément dans la queue on injecte ce qu'il reste

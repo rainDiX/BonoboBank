@@ -6,7 +6,7 @@ import bcb.User;
 
 public class Main {
 
-    public static void launchBCB(int difficulty, int userCount, int blockCount, long initialReward, boolean saving,
+    public static void launchBCB(int difficulty, int userCount, int blockCount, int transacLimit,long initialReward, boolean saving,
             String filename) {
         Logger logr = Logger.getLogger("launchBCB");
         logr.info("difficulté du minage: " + difficulty);
@@ -15,7 +15,7 @@ public class Main {
         logr.info("Récompense de l'helicopter money: " + initialReward + " satoBnb");
         logr.info("Récompense de l'helicopter money: " + initialReward / 100000000l + " Bnb");
 
-        CentralBank coinbase = new CentralBank("coinbase", initialReward, difficulty);
+        CentralBank coinbase = new CentralBank("coinbase", initialReward, difficulty, transacLimit);
         // Ajout de N utilisateurs
         for (int i = 1; i <= userCount; ++i) {
             coinbase.addUser("User");
@@ -56,6 +56,7 @@ public class Main {
         System.out.println("Arguments Valide :");
         System.out.println("-b nombre : nombre de block à miner (10 par défaut)");
         System.out.println("-d difficulté : difficulté du minage (4 par défaut)");
+        System.out.println("-t nombre : nombre de transaction maximum par bloc(10 par défaut)");
         System.out.println("-r montant : Montant initial en Bnb recu pendant d'helicopter Money (50 Bnb par défaut)");
         System.out.println("-u nb : nombre d'utilisateur (10 par défaut)");
         System.out.println("-f fichier.json : fichier contenant une blockchain");
@@ -70,6 +71,7 @@ public class Main {
         boolean helpflag = false;
         String savingPath = "";
         String openingPath = "";
+        int transacLimit = 10;
         int blockCount = -1;
         int difficulty = 4;
         // 50 Bnb
@@ -144,6 +146,19 @@ public class Main {
                     saving = true;
                     ++i;
                     break;
+                case "-t":
+                    if (i + 1 == args.length) {
+                        printUsage();
+                        throw new Exception("Argument manquant");
+                    }
+                    try {
+                        userCount = Integer.parseUnsignedInt(args[i + 1]);
+                        ++i;
+                    } catch (NumberFormatException ex) {
+                        System.out.println("le nombre de transaction maximum par bloc n'est pas fournis ou invalide");
+                        System.out.println("utilisation de la valeur par défaut");
+                    }
+                    break;
                 case "-f":
                     if (i + 1 == args.length) {
                         printUsage();
@@ -167,7 +182,7 @@ public class Main {
                 ContinueBCB(bcb, blockCount, saving, savingPath);
             }
         } else {
-            launchBCB(difficulty, userCount, blockCount, initialReward, saving, savingPath);
+            launchBCB(difficulty, userCount, blockCount, transacLimit,initialReward, saving, savingPath);
         }
     }
 }

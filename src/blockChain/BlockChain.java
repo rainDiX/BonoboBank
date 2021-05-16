@@ -22,6 +22,12 @@ public class BlockChain implements Iterable<Block> {
      * d'un bloc
      */
     private int difficulty;
+
+    /**
+     * Nombre maximum de transaction par block
+     */
+    private int transacLimit = 10;
+
     /**
      * Liste de blocs
      */
@@ -34,9 +40,11 @@ public class BlockChain implements Iterable<Block> {
      * <p>
      * 
      * @param difficulty      index du block
+     * @param transacLimit     Nb max de transaction par block
      */
-    public BlockChain(int difficulty) {
+    public BlockChain(int difficulty, int transacLimit) {
         this.difficulty = difficulty;
+        this.transacLimit = transacLimit;
         this.blockList = new LinkedList<Block>();
     }
 
@@ -53,7 +61,8 @@ public class BlockChain implements Iterable<Block> {
             blockList.add(b);
             return true;
         } else if (b.getHash().startsWith("0".repeat(this.difficulty))
-                && b.getPrevBlockHash() == blockList.getLast().getHash() && b.getIndex() == blockList.size()) {
+                && b.getPrevBlockHash() == blockList.getLast().getHash() && b.getIndex() == blockList.size()
+                && b.getTransactionCount() <= this.transacLimit) {
             blockList.add(b);
             return true;
         }
@@ -70,6 +79,14 @@ public class BlockChain implements Iterable<Block> {
 
     public int getSize() {
         return blockList.size();
+    }
+
+    /**
+     * 
+     * @return Nombre maximum de transaction par block
+     */
+    public int getTransacLimit() {
+        return this.transacLimit;
     }
 
     public Block getBlockAtIndex(int index) {
