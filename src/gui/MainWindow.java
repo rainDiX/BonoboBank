@@ -93,8 +93,8 @@ public class MainWindow extends JFrame {
 
 			@Override
 			public void componentHidden(ComponentEvent e) {
-				bank = cw.getBank();
-				if (bank != null) {
+				if (cw.getBank() != null) {
+					bank = cw.getBank();
 					updateGUIElements();
 					bcv.loadNewBlockChain(bank.getBlockChain());
 				}
