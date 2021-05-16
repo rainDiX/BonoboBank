@@ -3,11 +3,18 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch GUI",
+            "request": "launch",
+            "mainClass": "App",
+            "projectName": "BonoboBank"
+        },
+        {
+            "type": "java",
             "name": "Launch Main Writing to a file",
             "request": "launch",
             "mainClass": "Main",
             "projectName": "BonoboBank",
-            "args": "-d 4 -b 1000 -u 666 -s test4.json -v"
+            "args": "-d 4 -b 1000 -u 100 -s test4.json"
         },
         {
             "type": "java",
@@ -16,13 +23,6 @@
             "mainClass": "Main",
             "projectName": "BonoboBank",
             "args": "-f test4.json"
-        },
-        {
-            "type": "java",
-            "name": "Launch WelcomeWindow",
-            "request": "launch",
-            "mainClass": "gui.WelcomeWindow",
-            "projectName": "BonoboBank"
         },
         {
             "type": "java",

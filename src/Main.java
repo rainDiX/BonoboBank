@@ -23,7 +23,6 @@ public class Main {
 
         // Genesis
         coinbase.genesis();
-
         // Helicopter Money
         coinbase.helicopterMoney();
         // Phase de marché :

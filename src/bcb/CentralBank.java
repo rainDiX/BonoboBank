@@ -214,6 +214,14 @@ public class CentralBank implements Iterable<Transaction> {
     }
 
     /**
+     * 
+     * @return la blockchain
+     */
+    public BlockChain getBlockChain() {
+        return this.blockchain;
+    }
+
+    /**
      * Créer le block Genesis
      */
     public void genesis() {

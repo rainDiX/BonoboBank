@@ -10,20 +10,27 @@ import bcb.CentralBank;
 
 import javax.swing.JSpinner;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+
 import java.awt.event.ActionListener;
+import java.awt.Component;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 
-public class CreationWizard extends JFrame {
+public class CreationWizard extends JDialog {
 
 	private JTextField txtBanqueName;
+	
+	private CentralBank bank;
 
 	/**
 	 * Create the frame.
 	 */
 	public CreationWizard() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindow.class.getResource("/ressources/000.png")));
 		setTitle("Creation d'une nouvelle banque");
 		setBounds(100, 100, 500, 222);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		SpringLayout springLayout = new SpringLayout();
 		getContentPane().setLayout(springLayout);
 		
@@ -92,28 +99,28 @@ public class CreationWizard extends JFrame {
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				long initialReward = ((Integer) rewardSpinner.getValue()) * 100000000l;
-				CentralBank bcb = new CentralBank(txtBanqueName.getText(), initialReward , (Integer) spinnerDifficulty.getValue());
+				bank = new CentralBank(txtBanqueName.getText(), initialReward , (Integer) spinnerDifficulty.getValue());
 				int userCount = (Integer) spinnerUser.getValue();
 				// Ajout de N utilisateurs
 		        for (int i = 1; i <= userCount; ++i) {
-		            bcb.addUser("User");
+		            bank.addUser("User");
 		        }
-
 		        // Genesis
-		        bcb.genesis();
-
+		        bank.genesis();
 		        // Helicopter Money
-		        bcb.helicopterMoney();
+		        bank.helicopterMoney();
 		        // Phase de marché :
-		        bcb.mercatoPhase((Integer)blockSpinner.getValue());
-		        
-		        // Visualisation de la blockchain cree
-		        MainWindow visu = new MainWindow(bcb);
-				visu.setVisible(true);
+		        bank.mercatoPhase((Integer)blockSpinner.getValue());
+		        setVisible(false);
 			}
 		});
 		springLayout.putConstraint(SpringLayout.SOUTH, btnStart, -10, SpringLayout.SOUTH, getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, btnStart, -10, SpringLayout.EAST, getContentPane());
 		getContentPane().add(btnStart);
 	}
+	
+	public CentralBank getBank() {
+		return bank;
+	}
+	
 }
