@@ -56,9 +56,10 @@ public class BlockView extends JDialog {
 		getContentPane().add(lblNonce);
 		
 		JLabel lblNonceN = new JLabel("0");
+		springLayout.putConstraint(SpringLayout.WEST, lblNonceN, 10, SpringLayout.WEST, getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, lblNonceN, -10, SpringLayout.EAST, getContentPane());
 		springLayout.putConstraint(SpringLayout.EAST, labelIndexN, 0, SpringLayout.EAST, lblNonceN);
 		springLayout.putConstraint(SpringLayout.NORTH, lblNonceN, 6, SpringLayout.SOUTH, lblNonce);
-		springLayout.putConstraint(SpringLayout.WEST, lblNonceN, 10, SpringLayout.WEST, getContentPane());
 		lblNonceN.setFont(new Font("Dialog", Font.PLAIN, 12));
 		lblNonceN.setText((Integer.toString(block.getNonce())));
 		getContentPane().add(lblNonceN);
@@ -123,12 +124,12 @@ public class BlockView extends JDialog {
 		}
 		JList list = new JList(ltx);
 		JScrollPane scrollableList = new JScrollPane(list);
-		springLayout.putConstraint(SpringLayout.EAST, lblNonceN, 0, SpringLayout.EAST, scrollableList);
 		springLayout.putConstraint(SpringLayout.NORTH, scrollableList, 6, SpringLayout.SOUTH, lblTransactions);
 		springLayout.putConstraint(SpringLayout.WEST, scrollableList, 10, SpringLayout.WEST, getContentPane());
 		getContentPane().add(scrollableList);
 		
 		JButton btnCheck = new JButton("Vérifier");
+		springLayout.putConstraint(SpringLayout.SOUTH, scrollableList, -6, SpringLayout.NORTH, btnCheck);
 		springLayout.putConstraint(SpringLayout.EAST, scrollableList, 0, SpringLayout.EAST, btnCheck);
 		btnCheck.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

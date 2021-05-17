@@ -163,6 +163,7 @@ public class MainWindow extends JFrame {
 					if (blockCount > 0) {
 						bank.mercatoPhase(blockCount);
 						updateGUIElements();
+						JOptionPane.showMessageDialog(null, "Calcul terminé");
 					}
 				}
 			}
